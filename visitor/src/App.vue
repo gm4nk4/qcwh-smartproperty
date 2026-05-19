@@ -1,9 +1,6 @@
 <template>
 	<el-config-provider :size="getGlobalComponentSize" :locale="getGlobalI18n">
 		<router-view v-show="setLockScreen" />
-		<LockScreen v-if="themeConfig.isLockScreen" />
-		<Settings ref="settingRef" v-show="themeConfig.lockScreenTime > 1" />
-		<CloseFull v-if="!themeConfig.isLockScreen" />
 	</el-config-provider>
 </template>
 
@@ -15,11 +12,6 @@ import other from '/@/utils/other';
 import { Local, Session } from '/@/utils/storage';
 import mittBus from '/@/utils/mitt';
 import setIntroduction from '/@/utils/setIconfont';
-
-// 引入组件
-const LockScreen = defineAsyncComponent(() => import('/@/layout/lockScreen/index.vue'));
-const Settings = defineAsyncComponent(() => import('/@/layout/navBars/breadcrumb/settings.vue'));
-const CloseFull = defineAsyncComponent(() => import('/@/layout/navBars/breadcrumb/closeFull.vue'));
 
 // 定义变量内容
 const { messages, locale } = useI18n();
