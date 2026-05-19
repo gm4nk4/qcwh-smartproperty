@@ -146,7 +146,7 @@
 
 ## P0-6. 清理 visitor 自研 layout
 
-- **状态**: ☐ pending
+- **状态**: ☑ done (PR #TBD, 2026-05-19)
 - **Owns**:
   - `visitor/src/layout/main/**`(删)
   - `visitor/src/layout/component/**`(删)
@@ -159,6 +159,7 @@
   - `visitor/src/App.vue`(清理 lockScreen / settings 等引用,若 P0-4 已处理则跳过)
 - **依赖**: P0-3
 - **历史**:
+  - 2026-05-19 PR #TBD 删除 visitor/src/layout 下 8 个自研子目录(`main/`、`component/`、`navBars/`、`navMenu/`、`routerView/`、`footer/`、`lockScreen/`、`logo/`),全部能力已迁到 `@zhqc-smart/layout` 公共包;`App.vue` 移除 `LockScreen`/`Settings`/`CloseFull` 三处 `defineAsyncComponent` import 与对应模板节点。`visitor/src/layout/` 只保留 `index.vue`(P0-3 已改为 `@zhqc-smart/layout` 接入)。`npm run dev` 启动 OK(HTTP 200,无新增报错);`npm run build` 仍受 P0-8 影响,与本任务无关。注:`stores/themeConfig.ts` 与 `router/index.ts` 残留的「`/@/layout/...` 注释」属于 P0-4 / Phase 2 收口范畴,本 PR 不动。
 
 ## P0-7. 把并行守则写入本文件
 
