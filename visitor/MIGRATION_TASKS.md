@@ -356,11 +356,12 @@
 
 ### C0. 共享 hook(`useThemeOrUserInfo`) — Track C 公共前置
 
-- **状态**: ☐ pending
+- **状态**: ☑ done (PR #10, 2026-05-19)
 - **Owns**: `visitor/src/hooks/useThemeOrUserInfo.ts`(新增)
 - **依赖**: P0-1, P0-4
 - **内容**: 从 `access/src/hooks/useThemeOrUserInfo.ts` 复制。**C2-C10 多个 PR 都会依赖它,所以必须先于这些任务合并**。建议放在 Phase 0 末尾或作为 Phase 1 第一个被领取的任务
 - **历史**:
+  - 2026-05-19 PR #10 从 access 复制 `useThemeOrUserInfo.ts`(13 行)到 `visitor/src/hooks/`,与 visitor 现有 `stores/{userInfo,themeConfig}.ts` 兼容(`useUserInfo` 暴露 `userInfos`、`useThemeConfig` 暴露 `themeConfig`)。Track C 各任务(C2-C10)从此可统一 `import { useThemeOrUserInfo } from '/@/hooks/useThemeOrUserInfo'`。
 
 ## Track D — 边角(选做)
 
