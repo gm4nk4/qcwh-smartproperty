@@ -1,0 +1,22 @@
+{
+  "name": "@zhqc-smart/settings",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "./index.ts",
+  "module": "./index.ts",
+  "exports": {
+    ".": "./index.ts",
+    "./*": "./*"
+  },
+  "peerDependencies": {
+    "vue": "^3.5.0",
+    "element-plus": "^2.5.0",
+    "@vueuse/core": "^10.4.0",
+    "sortablejs": "^1.15.0",
+    "vue-router": "^4.4.0",
+    "pinia": "^2.1.0",
+    "echarts": "^5.5.0"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}

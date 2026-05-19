@@ -1,0 +1,24 @@
+{
+  "name": "@zhqc-smart/components",
+  "version": "1.0.0",
+  "description": "SmartPropertyManagementSystem Vue3 组件库 monorepo",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=@zhqc-smart/layout",
+    "build": "npm run build --workspace=@zhqc-smart/layout",
+    "build:all": "npm run build --workspaces",
+    "dev:table": "npm run dev --workspace=@zhqc-smart/table",
+    "dev:form": "npm run dev --workspace=@zhqc-smart/form"
+  },
+  "keywords": [
+    "vue",
+    "vue3",
+    "components",
+    "element-plus",
+    "micro-frontend"
+  ],
+  "author": "zhqc",
+  "license": "MIT"
+}

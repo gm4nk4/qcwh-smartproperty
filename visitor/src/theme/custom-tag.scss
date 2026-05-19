@@ -1,0 +1,411 @@
+/**
+ * 自定义状态标签样式-见原型状态预设
+ * 使用方式:
+ * <span class="status-tag status-tag--progressing">进行中</span>
+ */
+
+/* ========== 颜色变量 ========== */
+
+// 蓝色
+$blue-50:  #eff6ff;
+$blue-200: #bfdbfe;
+$blue-600: #2563eb;
+
+// 橙色
+$orange-50:  #fff7ed;
+$orange-200: #fed7aa;
+$orange-600: #ea580c;
+
+// 绿色
+$green-50:  #f0fdf4;
+$green-200: #bbf7d0;
+$green-600: #16a34a;
+
+// 灰色
+$gray-50:  #f9fafb;
+$gray-200: #e5e7eb;
+$gray-600: #6b7280;
+
+// 红色
+$red-50:  #fef2f2;
+$red-200: #fecaca;
+$red-600: #dc2626;
+
+// 黄色
+$yellow-50:  #fefce8;
+$yellow-200: #fef9c3;
+$yellow-600: #ca8a04;
+
+// 紫色
+$purple-50:  #faf5ff;
+$purple-200: #e9d5ff;
+$purple-600: #9333ea;
+
+// 青色
+$cyan-50:  #ecfeff;
+$cyan-200: #cffafe;
+$cyan-600: #0891b2;
+
+// 青绿色
+$teal-50:  #f0fdfa;
+$teal-200: #ccfbf1;
+$teal-600: #0d9488;
+
+/* ========== 基础 Mixin ========== */
+
+@mixin tag-base {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  line-height: 1;
+  border: 1px solid;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* ========== 状态标签基础类 ========== */
+
+.status-tag {
+  @include tag-base;
+}
+
+/* ========== 尺寸变体 ========== */
+
+.status-tag--sm {
+  padding: 2px 8px;
+  font-size: 11px;
+  border-radius: 3px;
+}
+
+.status-tag--lg {
+  padding: 6px 16px;
+  font-size: 14px;
+  border-radius: 6px;
+}
+
+/* ========== 状态样式定义 ========== */
+
+// 进行中
+.status-tag--progressing {
+  background-color: $blue-50;
+  border-color: $blue-200;
+  color: $blue-600;
+}
+
+// 待来访
+.status-tag--pending-visit {
+  background-color: $blue-50;
+  border-color: $blue-200;
+  color: $blue-600;
+}
+
+// 预立项中
+.status-tag--pre-project-ing {
+  background-color: $blue-50;
+  border-color: $blue-200;
+  color: $blue-600;
+}
+
+// 预立项完成
+.status-tag--pre-project-done {
+  background-color: $blue-50;
+  border-color: $blue-200;
+  color: $blue-600;
+}
+
+// 待发起评审
+.status-tag--waiting-review-start {
+  background-color: $blue-50;
+  border-color: $blue-200;
+  color: $blue-600;
+}
+
+// 已立项
+.status-tag--init {
+  background-color: $orange-50;
+  border-color: $orange-200;
+  color: $orange-600;
+}
+
+// 待审批
+.status-tag--waiting-approve {
+  background-color: $orange-50;
+  border-color: $orange-200;
+  color: $orange-600;
+}
+
+// 待审核
+.status-tag--waiting-audit {
+  background-color: $orange-50;
+  border-color: $orange-200;
+  color: $orange-600;
+}
+
+// 销售合同签订中
+.status-tag--contract-signing {
+  background-color: $orange-50;
+  border-color: $orange-200;
+  color: $orange-600;
+}
+
+// 销售合同签订完成
+.status-tag--contract-done {
+  background-color: $orange-50;
+  border-color: $orange-200;
+  color: $orange-600;
+}
+
+// 已结项
+.status-tag--knot {
+  background-color: $green-50;
+  border-color: $green-200;
+  color: $green-600;
+}
+
+// 已完成
+.status-tag--completed {
+  background-color: $green-50;
+  border-color: $green-200;
+  color: $green-600;
+}
+
+// 赢单
+.status-tag--won {
+  background-color: $green-50;
+  border-color: $green-200;
+  color: $green-600;
+}
+
+// 交底完成
+.status-tag--brief-done {
+  background-color: $green-50;
+  border-color: $green-200;
+  color: $green-600;
+}
+
+// 已入库归档
+.status-tag--archived {
+  background-color: $green-50;
+  border-color: $green-200;
+  color: $green-600;
+}
+
+// 已终止
+.status-tag--terminated {
+  background-color: $gray-50;
+  border-color: $gray-200;
+  color: $gray-600;
+}
+
+// 已失效
+.status-tag--expired {
+  background-color: $gray-50;
+  border-color: $gray-200;
+  color: $gray-600;
+}
+
+// 草稿
+.status-tag--draft {
+  background-color: $gray-50;
+  border-color: $gray-200;
+  color: $gray-600;
+}
+
+// 已驳回
+.status-tag--rejected {
+  background-color: $red-50;
+  border-color: $red-200;
+  color: $red-600;
+}
+
+// 输单
+.status-tag--lost {
+  background-color: $red-50;
+  border-color: $red-200;
+  color: $red-600;
+}
+
+// 已打回
+.status-tag--returned {
+  background-color: $red-50;
+  border-color: $red-200;
+  color: $red-600;
+}
+
+// 已撤回
+.status-tag--withdrawn {
+  background-color: $yellow-50;
+  border-color: $yellow-200;
+  color: $yellow-600;
+}
+
+// 已挂起
+.status-tag--suspended {
+  background-color: $purple-50;
+  border-color: $purple-200;
+  color: $purple-600;
+}
+
+// 投标申请中
+.status-tag--bid-ing {
+  background-color: $purple-50;
+  border-color: $purple-200;
+  color: $purple-600;
+}
+
+// 投标申请完成
+.status-tag--bid-done {
+  background-color: $purple-50;
+  border-color: $purple-200;
+  color: $purple-600;
+}
+
+// 待评审
+.status-tag--waiting-review {
+  background-color: $purple-50;
+  border-color: $purple-200;
+  color: $purple-600;
+}
+
+// 商机创建完成
+.status-tag--opportunity-done {
+  background-color: $cyan-50;
+  border-color: $cyan-200;
+  color: $cyan-600;
+}
+
+// 交底中
+.status-tag--brief-ing {
+  background-color: $teal-50;
+  border-color: $teal-200;
+  color: $teal-600;
+}
+
+// 待归档
+.status-tag--waiting-archive {
+  background-color: $teal-50;
+  border-color: $teal-200;
+  color: $teal-600;
+}
+
+// 一般变更
+.status-tag--level-normal {
+  background-color: $blue-50;
+  border-color: $blue-200;
+  color: $blue-600;
+}
+
+// 重要变更
+.status-tag--level-important {
+  background-color: $orange-50;
+  border-color: $orange-200;
+  color: $orange-600;
+}
+
+// 重大变更
+.status-tag--level-major {
+  background-color: $red-50;
+  border-color: $red-200;
+  color: $red-600;
+}
+
+
+// 高风险
+.status-tag--risk-high {
+  background-color: $red-50;
+  border-color: $red-200;
+  color: $red-600;
+}
+
+// 中风险
+.status-tag--risk-medium {
+  background-color: $orange-50;
+  border-color: $orange-200;
+  color: $orange-600;
+}
+
+// 低风险
+.status-tag--risk-low {
+  background-color: $blue-50;
+  border-color: $blue-200;
+  color: $blue-600;
+}
+
+
+// 已解决
+.status-tag--resolved {
+  background-color: $green-50;
+  border-color: $green-200;
+  color: $green-600;
+}
+
+// 未解决
+.status-tag--unresolved {
+  background-color: $gray-50;
+  border-color: $gray-200;
+  color: $gray-600;
+}
+
+// 市场类
+.status-tag--market {
+  background-color: $blue-50;
+  border-color: $blue-200;
+  color: $blue-600;
+}
+
+// 非市场类
+.status-tag--nomarket {
+  background-color: $orange-50;
+  border-color: $orange-200;
+  color: $orange-600;
+}
+
+// 优秀
+.status-tag--excellent {
+  background-color: $blue-50;
+  border-color: $blue-200;
+  color: $blue-600;
+}
+
+// 合格
+.status-tag--qualified {
+  background-color: $green-50;
+  border-color: $green-200;
+  color: $green-600;
+}
+
+// 不合格
+.status-tag--noQualified {
+  background-color: $red-50;
+  border-color: $red-200;
+  color: $red-600;
+}
+// A级
+.status-tag--LevelA {
+  background-color: $orange-50;
+  border-color: $orange-200;
+  color: $orange-600;
+}
+
+// B级
+.status-tag--LevelB {
+  background-color: $blue-50;
+  border-color: $blue-200;
+  color: $blue-600;
+}
+
+// C级
+.status-tag--LevelC {
+  background-color: $cyan-50;
+  border-color: $cyan-200;
+  color: $cyan-600;
+}
+
+
+// 待评分
+.status-tag--scoring {
+  background-color: $orange-50;
+  border-color: $orange-200;
+  color: $orange-600;
+}

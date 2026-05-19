@@ -1,0 +1,238 @@
+<template>
+	<el-dialog title="感应器数据导入" v-model="visible" :close-on-click-modal="false" draggable width="600">
+		<!-- 顶部提示信息区 -->
+		<div class="info-tip">
+			<el-icon class="info-icon"><InfoFilled /></el-icon>
+			<span>支持导入 Excel / CSV 格式的感应器数据，系统将自动根据车位编号匹配绑定对应感应器。</span>
+		</div>
+
+		<!-- 中间文件上传区 -->
+		<el-upload
+			ref="uploadRef"
+			class="upload-area"
+			drag
+			action="#"
+			:auto-upload="false"
+			:limit="1"
+			accept=".xlsx,.csv"
+			:on-change="handleFileChange"
+			:on-exceed="handleExceed"
+		>
+			<el-icon class="upload-icon"><Upload /></el-icon>
+			<div class="upload-text">点击或拖拽文件到此区域</div>
+			<div class="upload-tip">支持 .xlsx / .csv 格式，单次最多500条</div>
+		</el-upload>
+
+		<!-- 底部模板下载区 -->
+		<div class="template-area">
+			<div class="template-title">导入模板</div>
+			<div class="template-row">
+				<el-button class="download-btn" @click="handleDownload">
+					<el-icon class="download-icon"><Download /></el-icon>
+					<span>下载模板</span>
+				</el-button>
+				<span class="template-desc">模板包含：车位编号、感应器编号、感应器型号</span>
+			</div>
+		</div>
+
+		<template #footer>
+			<span class="dialog-footer">
+				<el-button @click="visible = false">取消</el-button>
+				<el-button type="primary" :disabled="!hasFile" :loading="loading" @click="handleImport">开始导入</el-button>
+			</span>
+		</template>
+	</el-dialog>
+</template>
+
+<script setup lang="ts" name="ImportDialog">
+import { ref } from 'vue';
+import { InfoFilled, Upload, Download } from '@element-plus/icons-vue';
+import { useMessage } from '/@/hooks/message';
+import { importSensor } from '/@/api/parkingInfo';
+import { isInQiankun } from '/@/qiankun/actions';
+
+// 子应用 entry URL，用于微前端环境下获取静态资源
+const SUB_APP_ENTRY = import.meta.env.VITE_SUB_APP_ENTRY || '';
+
+const emit = defineEmits(['refresh']);
+const visible = ref(false);
+const loading = ref(false);
+const hasFile = ref(false);
+const currentFile = ref<File | null>(null);
+
+// 打开弹窗
+const openDialog = () => {
+	visible.value = true;
+	hasFile.value = false;
+	currentFile.value = null;
+};
+
+// 文件变化
+const handleFileChange = (file: any) => {
+	currentFile.value = file.raw;
+	hasFile.value = true;
+};
+
+// 超出限制
+const handleExceed = () => {
+	useMessage().warning('单次最多上传1个文件');
+};
+
+// 微前端环境下下载模板（跨域需要 fetch + blob）
+const downloadInQiankun = async () => {
+	const response = await fetch(`${SUB_APP_ENTRY}/template/sensor-import-template.xlsx`);
+	if (!response.ok) throw new Error('下载失败');
+	const blob = await response.blob();
+	const url = window.URL.createObjectURL(blob);
+	const link = document.createElement('a');
+	link.href = url;
+	link.download = '感应器导入模板.xlsx';
+	link.click();
+	window.URL.revokeObjectURL(url);
+};
+
+// 独立运行环境下下载模板（同域直接下载）
+const downloadStandalone = () => {
+	const link = document.createElement('a');
+	link.href = `${import.meta.env.BASE_URL}template/sensor-import-template.xlsx`;
+	link.download = '感应器导入模板.xlsx';
+	link.click();
+};
+
+// 下载模板
+const handleDownload = async () => {
+	try {
+		if (isInQiankun()) {
+			await downloadInQiankun();
+		} else {
+			downloadStandalone();
+		}
+	} catch (error) {
+		useMessage().error('模板下载失败，请稍后重试');
+	}
+};
+
+// 导入
+const handleImport = async () => {
+	if (!currentFile.value) return;
+
+	try {
+		loading.value = true;
+		const res = await importSensor(currentFile.value);
+		if (res.code === 0) {
+			useMessage().success('导入成功');
+			visible.value = false;
+			emit('refresh');
+		} else {
+			useMessage().error(res.msg || '导入失败');
+		}
+	} catch (err: any) {
+		useMessage().error(err.msg || '导入失败');
+	} finally {
+		loading.value = false;
+	}
+};
+
+// 暴露变量
+defineExpose({
+	openDialog,
+});
+</script>
+
+<style scoped lang="scss">
+.info-tip {
+	display: flex;
+	align-items: center;
+	padding: 12px 16px;
+	background: var(--el-color-primary-light-9);
+	border-radius: 4px;
+	margin-bottom: 16px;
+}
+
+.info-icon {
+	color: var(--el-color-primary);
+	font-size: 18px;
+	margin-right: 8px;
+	flex-shrink: 0;
+}
+
+.info-tip span {
+	color: var(--el-color-primary);
+	font-size: 14px;
+	line-height: 1.5;
+}
+
+.upload-area {
+	margin-bottom: 24px;
+
+	:deep(.el-upload-dragger) {
+		width: 100%;
+		height: 160px;
+		border: 1px dashed #d9d9d9;
+		border-radius: 4px;
+		background: #fafafa;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		transition: border-color 0.2s;
+
+		&:hover {
+			border-color: var(--el-color-primary);
+		}
+	}
+
+	:deep(.el-upload) {
+		width: 100%;
+	}
+}
+
+.upload-icon {
+	font-size: 40px;
+	color: #c0c4cc;
+	margin-bottom: 12px;
+}
+
+.upload-text {
+	font-size: 14px;
+	color: #606266;
+	margin-bottom: 8px;
+}
+
+.upload-tip {
+	font-size: 12px;
+	color: #909399;
+}
+
+.template-area {
+	margin-top: 20px;
+}
+
+.template-title {
+	font-size: 14px;
+	color: #606266;
+	margin-bottom: 12px;
+}
+
+.template-row {
+	display: flex;
+	align-items: center;
+}
+
+.download-btn {
+	display: flex;
+	align-items: center;
+	padding: 8px 16px;
+}
+
+.download-icon {
+	font-size: 14px;
+	margin-right: 6px;
+}
+
+.template-desc {
+	font-size: 12px;
+	color: #909399;
+	margin-left: 16px;
+}
+</style>

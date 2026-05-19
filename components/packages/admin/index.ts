@@ -1,0 +1,13 @@
+export { default as AdminClient } from "./views/client/index.vue";
+export { default as AdminDept } from "./views/dept/index.vue";
+export { default as AdminDict } from "./views/dict/index.vue";
+export { default as AdminDictDictItem } from "./views/dict/dictItem/index.vue";
+export { default as AdminFile } from "./views/file/index.vue";
+export { default as AdminLog } from "./views/log/index.vue";
+export { default as AdminMenu } from "./views/menu/index.vue";
+export { default as AdminParam } from "./views/param/index.vue";
+export { default as AdminPost } from "./views/post/index.vue";
+export { default as AdminRole } from "./views/role/index.vue";
+export { default as AdminToken } from "./views/token/index.vue";
+export { default as AdminUser } from "./views/user/index.vue";
+export { default as AdminUserPersonal } from "./views/user/personal.vue";
