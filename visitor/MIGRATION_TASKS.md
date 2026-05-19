@@ -1,112 +1,375 @@
-# Visitor 子应用 — 迁移与样式改造 任务清单
+# Visitor 子应用 — 并行任务清单
 
-> **本文件是 visitor 子应用所有后续改造工作的唯一任务源。**
-> 在动手之前请先读仓库根的 `AGENTS.md`,了解项目边界(`access/`、`parking/`、`components/` 不可改动)。
->
-> **完成任务必须做的事**:
-> 1. 将对应任务前的 `[ ]` 改成 `[x]`
-> 2. 在该任务条目下方追加一行(2 空格缩进 + `-`)记录:**日期 / PR 号 / 主要改动文件**
-> 3. 若清单需要新增/拆分/废弃任务,在同一 PR 里改,并在 PR 描述里说明理由
-> 4. 不要私自删除未完成的任务;如要废弃,加删除线 `~~A1~~` 并写原因
+> **本文件是 visitor 子应用所有改造工作的唯一任务源,专为多 Agent 并行执行设计。**
+> 动手前必须先读仓库根 `AGENTS.md`,并完整读完下面的「并行执行守则」一节。
 
 ---
 
-## 范围说明
+## 并行执行守则(任何 Agent 必读)
 
-- 本清单仅涉及 `visitor/` 和(必要时)`main-app/` 的改动。
-- `access/`、`parking/`、`components/` 仅作为参考,**禁止修改**。
-- visitor 子应用目前所有功能均已具备且使用模拟数据,**当前阶段不对接后端**,主要工作是样式调整 + 公共能力迁移。
+### 1. 阶段(Phase)
+
+| 阶段 | 并发模式 | 内容 | 启动前提 |
+| --- | --- | --- | --- |
+| **Phase 0** | **单 Agent 串行** | 打基础:引入公共组件、qiankun 接入、Layout、主题工具、**一次性加完 permission/portal 全部占位路由**、清理旧 layout | 无 |
+| **Phase 1** | **多 Agent 并行**(3 条 Track) | Track-B 列表页改造、Track-C 权限/门户模块迁移、Track-D 边角 | **Phase 0 全部任务合并到 main 之后** |
+| **Phase 2** | **单 Agent 串行** | i18n 收口、最终 lint、main-app 联调、截图录屏验收 | **Phase 1 所有用户指派的任务完成后** |
+
+### 2. 任务定义格式(每个任务必备 4 字段)
+
+- **Owns**:本任务**唯一**允许修改/新增的文件路径(glob)。改这些之外的任何文件 → 必须先停下来,在 PR 评论里说明,等用户决策。
+- **依赖**:本任务开工前必须已合并到 main 的任务 ID 列表。
+- **状态**:`☐ pending` / `🟡 in-progress (Agent ID, 分支)` / `☑ done (PR #x, YYYY-MM-DD)`。
+- **历史**:已完成或正在进行中的工作日志,追加格式 `- YYYY-MM-DD PR #x 简述`。
+
+### 3. 分支与 PR 约定
+
+- 分支名:**`devin/<unix-timestamp>-<TASK_ID>-<short-slug>`**
+  - 例: `devin/1700000000-B3-blacklist-refactor`、`devin/1700000010-C2-permission-user`
+- **每个 PR 只完成一个任务 ID**(不要把 B1+B2 塞进同一个 PR)
+- PR 标题必须以 `[<TASK_ID>] ` 开头,例:`[B3] visitor 黑名单页接入 ConfigurableTableWithForm`
+- PR 描述里明写本次完成的任务 ID 及对应 Owns 文件清单
+
+### 4. 公共文件冲突预防规则
+
+| 公共文件 | 规则 |
+| --- | --- |
+| `visitor/package.json` | **Phase 0 后冻结**。Phase 1 任务不得新增依赖;如确实需要,先开议题、由 Phase 0 补 PR 处理 |
+| `visitor/src/router/route.ts` | **Phase 0 一次性加完所有 permission/portal 占位路由**(component 暂时 import 一个 placeholder)。Phase 1 任务**不改 route.ts**,只在自己 Owns 目录写实际 component 文件 |
+| `visitor/src/i18n/lang/zh-cn.ts` / `en.ts` | **Phase 2 由 P2-1 统一收口**。Phase 1 各任务把自己模块的多语言文本写在该模块目录内的 `i18n/zh-cn.ts` / `i18n/en.ts`(独立文件,模块内自给) |
+| `visitor/src/stores/**` | Phase 0 后冻结。Phase 1 任务需新增 store 时,先和用户对齐 |
+| `visitor/src/utils/**` | Phase 0 后冻结。新增工具放进自己模块目录内 |
+| `visitor/MIGRATION_TASKS.md`(本文件) | 每个 PR **只改自己任务章节** 的「状态」与「历史」两字段。章节之间互相独立,Git 自动合并通常无冲突 |
+| `AGENTS.md` | 不动,除非你的任务就是改它 |
+
+### 5. 完工流程(Agent 合并前必做)
+
+1. PR 准备合并前,从最新 main rebase 一次。
+2. 把本任务章节的 **状态** 从 `☐ pending` → `☑ done (PR #x, YYYY-MM-DD)`。
+3. 在本任务章节的 **历史** 段追加一行:`- YYYY-MM-DD PR #x <一句话简述>`。
+4. **不要动其他任务的章节**(即使你"顺手"把别的也做了)。
+5. PR 描述里:
+   - 第一行声明任务 ID
+   - 附本次新增/修改的 Owns 文件清单
+   - 视觉改动附截图
+
+### 6. Rebase 冲突处理
+
+- 若 rebase 时 `MIGRATION_TASKS.md` 冲突:**保留 main 的所有其他任务章节,只保留自己任务章节里的修改**。
+- 若 rebase 时其他源码冲突:说明 Owns 边界划错了,**停下来**先通知用户决策。
 
 ---
 
-## 一、基础设施 / 框架对齐(让 visitor 拥有和 access/parking 一致的运行底座)
+# Phase 0 — 基础设施(单 Agent 串行,Phase 1 启动前必须全部合并)
 
-- [ ] **A1. package.json 引入公共依赖** — 在 `visitor/package.json` `dependencies` 中新增以下 file 依赖(参考 `access/package.json`):
+> 这一阶段所有任务可以由同一个 Agent 在一个 PR 里一次性做完,也可以拆成多个小 PR 串行做。**关键是 Phase 1 启动时,P0-1 ~ P0-7 必须全部 done。**
+
+## P0-1. 引入公共组件依赖
+
+- **状态**: ☐ pending
+- **Owns**:
+  - `visitor/package.json`(只新增 4 行 file 依赖)
+- **依赖**: 无
+- **内容**: 在 `visitor/package.json` 的 `dependencies` 中新增(参考 `access/package.json`):
   - `"@zhqc-smart/layout": "file:../components/packages/layout"`
   - `"@zhqc-smart/table": "file:../components/packages/table"`
   - `"@zhqc-smart/admin": "file:../components/packages/admin"`
   - `"@zhqc-smart/settings": "file:../components/packages/settings"`
-- [ ] **A2. 新增 `visitor/src/qiankun/` 目录** — 从 `access/src/qiankun/` 复制 `actions.ts` 与 `communication.ts`,提供 `setActions / getActions / isInQiankun / initGlobalStateListener / destroyGlobalStateListener`
-- [ ] **A3. 新增 `visitor/src/hooks/useQiankun.ts`** — 与 `access/src/hooks/useQiankun.ts` 一致,暴露 `inQiankun / goMainApp / navigateTo / goBack / toggleFullscreen / sendMessage / globalState`
-- [ ] **A4. 重写 `visitor/src/main.ts`** — 对齐 access/parking:
-  - import `setActions / initGlobalStateListener / destroyGlobalStateListener`
-  - 用 `isInQiankun()` 替换 `qiankunWindow.__POWERED_BY_QIANKUN__`
-  - `mount(props)` 里调 `setActions(props)` + `initGlobalStateListener()`
-  - `unmount()` 里调 `destroyGlobalStateListener()`
-- [ ] **A5. 重写 `visitor/src/layout/index.vue`** — 由自研 4 套布局统一切换为 `<Layout :showBack="inQiankun" @back="onBack" />`(`onBack = () => goMainApp()`),实现侧栏「← 返回统一门户」按钮。参考 `access/src/layout/index.vue`
-- [ ] **A6. 清理 visitor 自研 layout** — 移除 `visitor/src/layout/main/{defaults,classic,transverse,columns}.vue` 及配套的 `component/`、`navBars/`、`navMenu/`、`routerView/`、`footer/`、`lockScreen/`、`logo/`(确认无残留引用后删除)
-- [ ] **A7. 同步主题与工具** — 从 access 复制 `themeSkin.ts`、`themeImages.ts`、`themeLayoutIcons.ts`、`themeSidebar.ts`、`resolveComponent.ts` 到 `visitor/src/utils/`,并同步 `visitor/src/theme/config/skin.ts` 与 `theme/index.scss` 的差异
-- [ ] **A8. 同步 stores** — 将 `visitor/src/stores/themeConfig.ts` 对齐 access(基于 skin 的主题体系),保留 visitor 模块特有内容
-- [ ] **A9. 同步 `App.vue`** — 引入 `applyThemeCssVars / applyThemeMode`,保证主题切换即时生效
+- **历史**:
 
-## 二、列表页统一改用公共表格组件(`@zhqc-smart/table`)
+## P0-2. 接入 qiankun 通信
 
-> 参考实现:`access/src/views/permission/user/index.vue`、`access/src/views/portal/application/index.vue`
-> 核心组件:`ConfigurableTableWithForm`(查询表单 + 表格 + 分页一体)、`ConfigurableTable`(仅表格)、`ConfigurableQueryForm`(仅查询表单)
+- **状态**: ☐ pending
+- **Owns**:
+  - `visitor/src/qiankun/actions.ts`(新增,从 `access/src/qiankun/actions.ts` 复制)
+  - `visitor/src/qiankun/communication.ts`(新增,从 access 复制)
+  - `visitor/src/hooks/useQiankun.ts`(新增,从 `access/src/hooks/useQiankun.ts` 复制)
+  - `visitor/src/main.ts`(改:引入 `setActions/initGlobalStateListener/destroyGlobalStateListener`,`mount/unmount` 中调用)
+- **依赖**: P0-1
+- **历史**:
 
-- [ ] **B1. 预约记录** — 重构 `visitor/src/views/visitor/appointment-records/index.vue`,将自研 `<el-table>` + 查询面板替换为 `ConfigurableTableWithForm`,保留:列定义、查询表单字段、分页、操作列、详情弹窗
-- [ ] **B2. 通行记录** — 重构 `visitor/src/views/visitor/access-records/index.vue`,同上
-- [ ] **B3. 黑名单管理** — 重构 `visitor/src/views/visitor/blacklist/index.vue`,使用 `ConfigurableTableWithForm`,保留"新增/移除"操作及新增弹窗
-- [ ] **B4. 访客配置** — 重构 `visitor/src/views/visitor/config/index.vue` 中的设备表格,使用 `ConfigurableTable`(本页无查询面板)
-- [ ] **B5. 访客总览** — `visitor/src/views/visitor/overview/index.vue` 统一卡片/图表样式与 access `home/index.vue` 风格一致,复用相同的 `dashboardVars`/主题 CSS 变量,无需表格组件
-- [ ] **B6. 园区访客管理说明** — `visitor/src/views/visitor/park-guide/index.vue` 仅做样式微调与栅格对齐
+## P0-3. 接入公共 Layout(实现「返回统一门户」按钮)
 
-## 三、迁移 access 的「统一门户 + 统一权限」整模块到 visitor
+- **状态**: ☐ pending
+- **Owns**:
+  - `visitor/src/layout/index.vue`(改为 `<Layout :showBack="inQiankun" @back="goMainApp" />`,参考 `access/src/layout/index.vue`)
+- **依赖**: P0-1, P0-2
+- **历史**:
 
-> 来源:`access/src/views/portal/*`、`access/src/views/permission/*`、`access/src/router/mockRoute.ts`、对应的 i18n / mock / type / components
+## P0-4. 同步主题工具与 stores
 
-- [ ] **C1. 路由结构** — 在 visitor 中新增 `permission` 与 `portal` 两个一级菜单,并按下列子菜单注册(前端写死或参考 access 的 `mockRoute.ts`):
-  - `permission/user`(用户管理)
-  - `permission/role`(角色管理)
-  - `permission/position`(岗位管理)
-  - `permission/space`(空间管理)
-  - `permission/organization`(组织管理)
-  - `portal/application`(子应用管理)
-  - `portal/ai`(AI 工具中心)
-  - `portal/category`(应用分类)
-  - `portal/workbench`(工作台配置)
-- [ ] **C2. 用户管理(permission/user)** — 复制到 `visitor/src/views/permission/user/`:`index.vue`、`userDetail.vue`、`userAuthDialog.vue`、`userEditDialog.vue`、`userResetPwdDialog.vue`、`mock.ts`、`type.ts`、`components/`
-- [ ] **C3. 角色管理(permission/role)** — 复制到 `visitor/src/views/permission/role/`:`index.vue`、`components/`(含 `AppRoleTab.vue` 等)、`mock.ts`、`type.ts`
-- [ ] **C4. 岗位管理(permission/position)** — 复制到 `visitor/src/views/permission/position/`
-- [ ] **C5. 空间管理(permission/space)** — 复制到 `visitor/src/views/permission/space/`
-- [ ] **C6. 组织管理(permission/organization)** — 复制到 `visitor/src/views/permission/organization/`(含 `UnifiedOrgView.vue`)
-- [ ] **C7. 统一门户 - 子应用管理(portal/application)** — 复制到 `visitor/src/views/portal/application/`
-- [ ] **C8. 统一门户 - AI 工具中心(portal/ai)** — 复制到 `visitor/src/views/portal/ai/`(含 `components/ModelsManage.vue` 等)
-- [ ] **C9. 统一门户 - 应用分类(portal/category)** — 复制到 `visitor/src/views/portal/category/`
-- [ ] **C10. 统一门户 - 工作台配置(portal/workbench)** — 复制到 `visitor/src/views/portal/workbench/`
-- [ ] **C11. i18n / mock / api 兼容** — 按 visitor 现有 i18n 目录结构(`i18n/pages` 子目录)接入各模块多语言文本;mock 数据原样保留,**暂不对接后端**
-- [ ] **C12. `useThemeOrUserInfo` 钩子** — 因迁移的 user/role 页面会用到,需要复制 `access/src/hooks/useThemeOrUserInfo.ts` 到 visitor
+- **状态**: ☐ pending
+- **Owns**:
+  - `visitor/src/utils/themeSkin.ts`(新增,从 access 复制)
+  - `visitor/src/utils/themeImages.ts`(新增,从 access 复制)
+  - `visitor/src/utils/themeLayoutIcons.ts`(新增,从 access 复制)
+  - `visitor/src/utils/themeSidebar.ts`(新增,从 access 复制)
+  - `visitor/src/utils/resolveComponent.ts`(新增,从 access 复制)
+  - `visitor/src/theme/config/skin.ts`(新增,从 access 复制)
+  - `visitor/src/theme/index.scss`(必要时对齐 access 的差异)
+  - `visitor/src/stores/themeConfig.ts`(对齐 access 的基于 skin 的体系)
+  - `visitor/src/App.vue`(引入 `applyThemeCssVars / applyThemeMode`)
+- **依赖**: P0-1
+- **历史**:
 
-## 四、公共/边角细节
+## P0-5. 一次性占位路由(关键防冲突任务)
 
-- [ ] **D1. 返回统一门户按钮** — 由 A5 一并实现:子应用在 qiankun 中运行时左侧侧栏顶部出现「← 返回统一门户」,点击后 `goMainApp()` 回到 main-app
-- [ ] **D2. 主菜单跳转方式** — 与 access/parking 一致,visitor 默认进入 `/visitor/overview`(已就绪),迁移后侧栏同时展示 visitor 业务菜单 + 统一门户 + 权限菜单
-- [ ] **D3. admin 用户/角色页面同步(可选)** — `visitor/src/views/admin/user/{index,personal}.vue` 与 access 版本有差异;若要后台一致,需要同步 `UserAuthDialog.vue`、`userDetail.vue`、`mock.ts`、`type.ts`
-- [ ] **D4. theme-images 库(可选)** — access 中存在 `views/theme-images/index.vue` 主题图片库页面,visitor 没有,按需迁移
-- [ ] **D5. 登录页对齐** — 检查并对齐 `visitor/src/views/login/index.vue` 与 access 版本的视觉风格
-- [ ] **D6. 主应用注册(待确认)** — 如果以上模块要在统一门户中入口可见,需要确认 `main-app` 中是否新增 visitor 子菜单条目
+- **状态**: ☐ pending
+- **Owns**:
+  - `visitor/src/router/route.ts`(改:加完下面 9 条 permission/portal 路由,component 全部指向 `views/_placeholder/index.vue`)
+  - `visitor/src/views/_placeholder/index.vue`(新增:一个简单的 "Coming soon" 占位组件)
+- **依赖**: P0-3
+- **内容**: 加入以下 9 条路由(细节参照 `access/src/router/mockRoute.ts`):
+  - `/permission/user`、`/permission/role`、`/permission/position`、`/permission/space`、`/permission/organization`
+  - `/portal/application`、`/portal/ai`、`/portal/category`、`/portal/workbench`
 
-## 五、验收 / 质量保证
+  ⚠️ **重要**:每条路由的 `component` 在 P0-5 中先指向 `_placeholder/index.vue`。Phase 1 的 C2-C10 各自任务**复制实际页面到对应目录后,改导入路径**这一步**也算 Phase 1 的工作**(因为 Phase 1 任务允许改自己 Owns 内的文件,而 `route.ts` 仍冻结)→ 为此请用如下技巧:
 
-- [ ] **E1. `npm install` & `npm run dev`** — visitor 子应用本地启动通过
-- [ ] **E2. `npm run lint:eslint`** — eslint 通过
-- [ ] **E3. main-app 加载验证** — 在 `main-app` 中以 qiankun 微前端方式加载 visitor,验证侧栏「返回统一门户」按钮、菜单跳转、迁移页面均可正常打开并展示 mock 数据
-- [ ] **E4. 截图/录屏** — 在 PR 描述里附带迁移后的页面与样式对比
+  ```ts
+  // P0-5 中写法,Phase 1 任务无需改 route.ts
+  { path: '/permission/user', component: () => import('/@/views/permission/user/index.vue'), ... }
+  ```
+
+  C2-C10 只负责把 `views/permission/user/index.vue` 这个文件**真正写出来**(替代占位),不需要再动 `route.ts`。
+
+  ⚠️ **占位实现要点**:`views/_placeholder/index.vue` 文件保留;`views/permission/user/index.vue` 在 P0-5 阶段**也写一个临时占位**(再 export 一个 placeholder),这样路由能跑通且 Phase 1 任务直接覆盖该文件即可。
+
+- **历史**:
+
+## P0-6. 清理 visitor 自研 layout
+
+- **状态**: ☐ pending
+- **Owns**:
+  - `visitor/src/layout/main/**`(删)
+  - `visitor/src/layout/component/**`(删)
+  - `visitor/src/layout/navBars/**`(删)
+  - `visitor/src/layout/navMenu/**`(删)
+  - `visitor/src/layout/routerView/**`(删)
+  - `visitor/src/layout/footer/**`(删)
+  - `visitor/src/layout/lockScreen/**`(删,迁到 `@zhqc-smart/layout`)
+  - `visitor/src/layout/logo/**`(删)
+  - `visitor/src/App.vue`(清理 lockScreen / settings 等引用,若 P0-4 已处理则跳过)
+- **依赖**: P0-3
+- **历史**:
+
+## P0-7. 把并行守则写入本文件
+
+- **状态**: ☑ done (PR #1, 2026-05-19)
+- **Owns**:
+  - `AGENTS.md`、`visitor/MIGRATION_TASKS.md`
+- **依赖**: 无
+- **历史**:
+  - 2026-05-19 PR #1 文档与清单初版 + 并行执行守则
 
 ---
 
-## 待确认问题(动 C 区之前先和用户对一遍)
+# Phase 1 — 多 Agent 并行(三条独立 Track)
+
+> Phase 0 全部合入 main 后启动。三条 Track 内的任务大多互相独立,可以由不同 Agent 同时认领。
+
+## Track B — visitor 业务列表页接入公共表格组件
+
+> 改造目标:所有列表页接入 `ConfigurableTableWithForm` / `ConfigurableTable`(参考 `access/src/views/permission/user/index.vue`)
+
+### B1. 预约记录
+
+- **状态**: ☐ pending
+- **Owns**: `visitor/src/views/visitor/appointment-records/**`
+- **依赖**: P0-1, P0-2, P0-3
+- **内容**: 重构 `index.vue`,自研 `<el-table>` + 查询面板替换为 `ConfigurableTableWithForm`,保留列、查询字段、分页、操作列、详情弹窗
+- **历史**:
+
+### B2. 通行记录
+
+- **状态**: ☐ pending
+- **Owns**: `visitor/src/views/visitor/access-records/**`
+- **依赖**: P0-1, P0-2, P0-3
+- **历史**:
+
+### B3. 黑名单管理
+
+- **状态**: ☐ pending
+- **Owns**: `visitor/src/views/visitor/blacklist/**`
+- **依赖**: P0-1, P0-2, P0-3
+- **内容**: 接入 `ConfigurableTableWithForm`,保留"新增/移除"及新增弹窗
+- **历史**:
+
+### B4. 访客配置
+
+- **状态**: ☐ pending
+- **Owns**: `visitor/src/views/visitor/config/**`
+- **依赖**: P0-1, P0-2, P0-3
+- **内容**: 设备表格改为 `ConfigurableTable`(无查询面板)
+- **历史**:
+
+### B5. 访客总览
+
+- **状态**: ☐ pending
+- **Owns**: `visitor/src/views/visitor/overview/**`
+- **依赖**: P0-3, P0-4
+- **内容**: 卡片/图表样式对齐 access `home/index.vue`,复用 `dashboardVars` / 主题 CSS 变量
+- **历史**:
+
+### B6. 园区访客管理说明
+
+- **状态**: ☐ pending
+- **Owns**: `visitor/src/views/visitor/park-guide/**`
+- **依赖**: P0-3
+- **内容**: 样式微调 + 栅格对齐
+- **历史**:
+
+## Track C — 「统一门户 + 统一权限」模块迁移
+
+> 每个子任务把 access 对应目录整套复制到 visitor 同名目录,**保留 mock 数据,暂不对接后端**。模块内 i18n 写在自己目录的 `i18n/zh-cn.ts`、`i18n/en.ts`(独立文件,Phase 2 统一收口)。
+
+### C2. 用户管理
+
+- **状态**: ☐ pending
+- **Owns**: `visitor/src/views/permission/user/**`
+- **依赖**: P0-1, P0-3, P0-5(占位路由已加),C-COMMON-HOOK(`useThemeOrUserInfo`,见 C0)
+- **内容**: 复制 access 对应目录的 `index.vue`、`userDetail.vue`、`userAuthDialog.vue`、`userEditDialog.vue`、`userResetPwdDialog.vue`、`mock.ts`、`type.ts`、`components/`
+- **历史**:
+
+### C3. 角色管理
+
+- **状态**: ☐ pending
+- **Owns**: `visitor/src/views/permission/role/**`
+- **依赖**: P0-5, C0
+- **内容**: 复制 access 对应目录的 `index.vue`、`components/`(含 `AppRoleTab.vue` 等)、`mock.ts`、`type.ts`
+- **历史**:
+
+### C4. 岗位管理
+
+- **状态**: ☐ pending
+- **Owns**: `visitor/src/views/permission/position/**`
+- **依赖**: P0-5, C0
+- **历史**:
+
+### C5. 空间管理
+
+- **状态**: ☐ pending
+- **Owns**: `visitor/src/views/permission/space/**`
+- **依赖**: P0-5, C0
+- **历史**:
+
+### C6. 组织管理
+
+- **状态**: ☐ pending
+- **Owns**: `visitor/src/views/permission/organization/**`
+- **依赖**: P0-5, C0
+- **内容**: 包含 `UnifiedOrgView.vue`
+- **历史**:
+
+### C7. 统一门户 — 子应用管理
+
+- **状态**: ☐ pending
+- **Owns**: `visitor/src/views/portal/application/**`
+- **依赖**: P0-5, C0
+- **历史**:
+
+### C8. 统一门户 — AI 工具中心
+
+- **状态**: ☐ pending
+- **Owns**: `visitor/src/views/portal/ai/**`
+- **依赖**: P0-5, C0
+- **内容**: 包含 `components/ModelsManage.vue` 等
+- **历史**:
+
+### C9. 统一门户 — 应用分类
+
+- **状态**: ☐ pending
+- **Owns**: `visitor/src/views/portal/category/**`
+- **依赖**: P0-5, C0
+- **历史**:
+
+### C10. 统一门户 — 工作台配置
+
+- **状态**: ☐ pending
+- **Owns**: `visitor/src/views/portal/workbench/**`
+- **依赖**: P0-5, C0
+- **历史**:
+
+### C0. 共享 hook(`useThemeOrUserInfo`) — Track C 公共前置
+
+- **状态**: ☐ pending
+- **Owns**: `visitor/src/hooks/useThemeOrUserInfo.ts`(新增)
+- **依赖**: P0-1, P0-4
+- **内容**: 从 `access/src/hooks/useThemeOrUserInfo.ts` 复制。**C2-C10 多个 PR 都会依赖它,所以必须先于这些任务合并**。建议放在 Phase 0 末尾或作为 Phase 1 第一个被领取的任务
+- **历史**:
+
+## Track D — 边角(选做)
+
+### D3. admin 用户/角色页面同步
+
+- **状态**: ☐ pending
+- **Owns**: `visitor/src/views/admin/user/**`
+- **依赖**: P0-1, P0-3
+- **内容**: 把 access 的 `UserAuthDialog.vue`、`userDetail.vue`、`mock.ts`、`type.ts`、`components/` 复制过来,使后台 admin 模块与 access 一致
+- **历史**:
+
+### D4. 主题图片库
+
+- **状态**: ☐ pending
+- **Owns**: `visitor/src/views/theme-images/**`(新增)、`visitor/src/router/route.ts` 加一行
+- **依赖**: P0-4
+- ⚠️ 本任务**例外**地需要改 `route.ts`(加一行 `/theme-images`),开 PR 前请先通知用户、避免和其他 PR 撞期。如果用户接受,可以一并放进 P0-5 一起做(更稳)
+- **历史**:
+
+### D5. 登录页对齐
+
+- **状态**: ☐ pending
+- **Owns**: `visitor/src/views/login/**`
+- **依赖**: P0-1, P0-4
+- **历史**:
+
+---
+
+# Phase 2 — 收口与验收(单 Agent 串行)
+
+## P2-1. i18n 统一收口
+
+- **状态**: ☐ pending
+- **Owns**:
+  - `visitor/src/i18n/lang/zh-cn.ts`、`visitor/src/i18n/lang/en.ts`
+  - `visitor/src/i18n/index.ts`、`visitor/src/i18n/pages/**`
+  - 各模块内 `i18n/zh-cn.ts`、`i18n/en.ts`(只读取,合并后可保留或删除)
+- **依赖**: 用户指派的 Phase 1 任务全部 done
+- **内容**: 把 Phase 1 各模块独立 i18n 文件合并到 `i18n/lang/*.ts`(或 `i18n/pages/*` 子模块),配置 vue-i18n 加载
+- **历史**:
+
+## P2-2. main-app 联调
+
+- **状态**: ☐ pending
+- **Owns**: 视情况可能需要改 `main-app/` 注册菜单(先和用户确认)
+- **依赖**: P2-1
+- **内容**: 在 main-app 中以 qiankun 方式加载 visitor,验证「返回统一门户」按钮、菜单跳转、所有迁移页面都能打开
+- **历史**:
+
+## P2-3. 最终 lint + build
+
+- **状态**: ☐ pending
+- **Owns**: 视情况修复(每条修复独立 PR)
+- **依赖**: P2-1
+- **内容**:
+  ```
+  cd visitor && npm install && npm run lint:eslint && npm run build
+  ```
+  全部通过
+- **历史**:
+
+## P2-4. 截图/录屏
+
+- **状态**: ☐ pending
+- **Owns**: 仅产出资源(放 PR 描述)
+- **依赖**: P2-2
+- **历史**:
+
+---
+
+# 待确认问题(开 Phase 1 Track C 前请用户回答)
 
 1. 「统一门户和权限」是否作为 visitor 顶级菜单常驻显示?还是仅在特定角色下显示?
-2. visitor 现有的 4 套布局切换成 `@zhqc-smart/layout` 后,是否完全弃用本地 layout?(建议:弃用,与 access/parking 保持一致)
-3. visitor 迁移过来的 permission/portal 页面菜单图标(iconfont)是否要重新设计?
-4. 顶部 tagsView、面包屑是否完全依赖 `@zhqc-smart/layout` 内置,无需另外定制?
-5. 是否同步 access 的「日志管理(log/audit/login/visit/maintenance)」与「set(daemon/menu/operation/systemConfiguration/systemDictionary)」整套配置中心?当前清单未包含,如需要可加入 C 区。
-
----
-
-## 任务执行历史(每次完成任务在这里追加一条)
-
-> 格式:`YYYY-MM-DD · PR #xx · 任务编号 · 简述`
-
-<!-- 例子:2026-05-19 · PR #1 · 初始化 · 增加 AGENTS.md 与 MIGRATION_TASKS.md -->
+2. visitor 现有的 4 套布局切换成 `@zhqc-smart/layout` 后,是否完全弃用本地 layout?(建议:弃用,与 access/parking 保持一致 → 默认按此执行)
+3. 迁移过来的 permission/portal 页面菜单图标(iconfont)是否要重新设计?
+4. 顶部 tagsView、面包屑是否完全依赖 `@zhqc-smart/layout` 内置?
+5. 是否同步 access 的「日志管理(log/audit/login/visit/maintenance)」与「set(daemon/menu/operation/systemConfiguration/systemDictionary)」整套配置中心?**当前清单未包含**,如需要请告知,会在 Track C 下补 C13-Cxx 新任务。
