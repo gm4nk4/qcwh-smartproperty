@@ -117,7 +117,7 @@
 
 ## P0-5. 一次性占位路由(关键防冲突任务)
 
-- **状态**: ☐ pending
+- **状态**: ☑ done (PR #TBD, 2026-05-19)
 - **Owns**:
   - `visitor/src/router/route.ts`(改:加完下面 9 条 permission/portal 路由,component 全部指向 `views/_placeholder/index.vue`)
   - `visitor/src/views/_placeholder/index.vue`(新增:一个简单的 "Coming soon" 占位组件)
@@ -138,6 +138,7 @@
   ⚠️ **占位实现要点**:`views/_placeholder/index.vue` 文件保留;`views/permission/user/index.vue` 在 P0-5 阶段**也写一个临时占位**(再 export 一个 placeholder),这样路由能跑通且 Phase 1 任务直接覆盖该文件即可。
 
 - **历史**:
+  - 2026-05-19 PR #TBD 新增 `views/_placeholder/index.vue` 通用 "Coming soon" 占位组件 + 9 个模块 `views/{permission,portal}/<name>/index.vue` 占位 re-export 文件,并在 `router/route.ts` 的 `dynamicRoutes` 中一次性追加 9 条 permission/* + portal/* 路由(每条 `component` 指向自身模块下的 `index.vue`)。`npm run dev` 启动 OK(HTTP 200),路由可加载;`npm run build` 仍受 P0-8 的 `screenfull/vue-router` resolve bug 影响,与本任务无关。
 
 ## P0-6. 清理 visitor 自研 layout
 
