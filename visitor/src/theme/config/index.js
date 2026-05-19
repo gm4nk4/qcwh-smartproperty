@@ -3,7 +3,7 @@ const blueTheme = {
 	color: {
 		// 主色配置
 		primary: {
-			normal: '#0094FF', // 主色-常规状态（蓝色主题）
+			normal: '#1677FF', // 主色-常规状态（蓝色主题）
 			hover: '#0086E6', // 主色-鼠标悬浮状态
 			disabled: '#BDDBF2', // 主色-禁用状态
 		},
@@ -13,7 +13,8 @@ const blueTheme = {
 			end: '#015CF8', // 渐变色-结束颜色
 		},
 		// 图表系列色（饼图/柱状图/折线图自动循环使用）
-		chart: ['#0094FF', '#00CAE8', '#E98A1D', '#E8BB19', '#BD74E6'],
+		chart: ['#1677FF', '#00CAE8', '#F59E0B', '#E8BB19', '#BD74E6','#9cb5c8','#F85A5A'],
+		gradientChart: ['#D9E3ED', '#E6F5F8', '#EDE2D9', '', '','#FBFDFF','#EDD9D9'],
 		// 功能状态色
 		functional: {
 			error: '#F85A5A', // 错误/失败/危险
@@ -67,7 +68,8 @@ const greenTheme = {
 			end: '#4BA6A9', // 渐变色-结束颜色
 		},
 		// 图表系列色
-		chart: ['#4BA6A9', '#00CAE8', '#E98A1D', '#E8BB19', '#BD74E6'],
+		chart: ['#4BA6A9', '#00CAE8', '#F59E0B', '#E8BB19', '#BD74E6','#9cb5c8','#F85A5A'],
+		gradientChart: ['#D9EDED', '#E6F5F8', '#EDE2D9', '', '','#FBFDFF','#EDD9D9'],
 		// 功能状态色
 		functional: {
 			error: '#F85A5A', // 错误/失败
