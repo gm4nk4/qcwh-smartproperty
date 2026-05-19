@@ -92,11 +92,12 @@
 
 ## P0-3. 接入公共 Layout(实现「返回统一门户」按钮)
 
-- **状态**: ☐ pending
+- **状态**: ☑ done (PR #5, 2026-05-19)
 - **Owns**:
   - `visitor/src/layout/index.vue`(改为 `<Layout :showBack="inQiankun" @back="goMainApp" />`,参考 `access/src/layout/index.vue`)
 - **依赖**: P0-1, P0-2
 - **历史**:
+  - 2026-05-19 PR #5 把 `visitor/src/layout/index.vue` 改为引用 `@zhqc-smart/layout` 的 `Layout` 组件,通过 `useQiankun()` 取 `inQiankun` 与 `goMainApp`,在 qiankun 子应用环境下显示「返回统一门户」按钮。`npm run dev` 验证通过(HTTP 200,layout 组件路径正确解析,`showBack` 与 `goMainApp` 已绑定);**`npm run build` 失败,详见新增的 P0-8 任务**(该问题为项目级预先存在 bug,access/parking 在 main 上的 `npm run build` 也同样失败,与本任务无关)
 
 ## P0-4. 同步主题工具与 stores
 
@@ -162,6 +163,61 @@
 - **依赖**: 无
 - **历史**:
   - 2026-05-19 PR #1 文档与清单初版 + 并行执行守则
+
+## P0-8. 修复 components/packages 软链导致的 `npm run build` 失败(项目级预先存在 bug)
+
+- **状态**: ☐ pending
+- **优先级 / 阻塞关系**:
+  - **不阻塞 Phase 1 启动**(Phase 1 各 Track 在 dev 模式下都能工作),但**必须在 P2-3 之前完成**
+  - **建议尽早做**(可以与 Phase 1 各 Track 并行),否则后续每个 PR 都无法通过 `npm run build` 自检
+- **背景 / 现象**:
+  - 在 P0-3(PR #5)实施过程中发现 `visitor/` 接入 `@zhqc-smart/layout` 后 `npm run build` 报错:
+    ```
+    [vite]: Rollup failed to resolve import "vue-router" from
+      components/packages/layout/src/routerView/link.vue
+    ```
+  - **不止 visitor**:在 main 分支上对 `access/` 与 `parking/` 也执行 `npm install && npm run build`,**同样报错**(均失败于 `components/packages/layout/src/routerView/link.vue` 找不到 `vue-router`)
+  - 因此这是项目级预先存在的 bug,与 P0-3 写法无关 —— P0-3 只是把 visitor 从「不使用 `@zhqc-smart/layout`」改成「使用」,从而暴露了同样的 bug
+  - `npm run dev` 模式不受影响(esbuild 预编译对软链 / file: 依赖处理与 rollup 不同)
+- **根因**:
+  - `components/packages/layout` 通过 `file:../components/packages/layout` 软链进入 `visitor/node_modules/@zhqc-smart/layout`
+  - 该包内部直接 `import` 一系列模块:`vue-router / pinia / element-plus / sortablejs / screenfull / @vueuse/core / vue-i18n` 等
+  - 这些模块在 layout 的 `package.json` 里部分声明为 `peerDependencies`(vue-router, pinia)、部分声明为 `dependencies`(sortablejs, screenfull, @vueuse/core, element-plus)、部分**没声明**(vue-i18n)
+  - **Rollup 在生产构建时**:从软链目标路径(`components/packages/layout/`)向上查 `node_modules`,但 `components/packages/layout/` 并未 `npm install`,而该目录的上级也不是 npm workspaces 项目,因此找不到这些模块
+  - **vite dev 模式**:esbuild 预捆绑会沿 `optimizeDeps` 流程把宿主 app(visitor)的依赖也喂给软链包,所以能跑通
+- **下个 Agent 的尝试清单(我已经在调研中试过,记录在此供节省时间)**:
+  - ✅ **试过:在 `visitor/vite.config.ts` 加 `resolve.dedupe: ['vue','vue-router','pinia','element-plus','@vueuse/core','sortablejs','screenfull']`**
+    - 解决了 vue-router / pinia,但 vue-i18n 仍然找不到(因为 visitor 的 alias `'vue-i18n': 'vue-i18n/dist/vue-i18n.cjs.js'` 在软链目标位置查不到那个具体文件)
+  - ✅ **试过:在 `components/packages/layout/` 里执行 `npm install` 安装其自身 dependencies**
+    - 解决了 sortablejs / screenfull / @vueuse/core 等 layout 自己的 deps,但 vue-router / pinia / vue-i18n 是 peerDependency 或未声明,装不下来,build 仍失败
+  - ❌ **未试:把 vue-router / pinia / vue-i18n 从 peerDependencies 移到 dependencies 并安装**
+    - 风险:vue 实例可能出现双份(子应用一份、host 一份),qiankun 场景下需要谨慎,可能需要在 main-app 通过 props 注入而不是各子应用各自装一份
+- **推荐方向(2 选 1)**:
+  - **方案 A(干净,但要改 components/)**:
+    - 修改 `components/packages/layout/package.json`:把 `vue-router / pinia` 写入 `dependencies`(同时保留 `peerDependencies`);追加 `vue-i18n` 到 `dependencies`
+    - 在 `components/packages/layout/` 内执行 `npm install` 生成 `package-lock.json` 并提交
+    - 在 visitor / access / parking 的 `vite.config.ts` 中加 `resolve.dedupe: ['vue','vue-router','pinia','vue-i18n','element-plus']` 以防多实例
+    - 同样处理 `components/packages/{table,admin,settings,form,login}` 各自暴露的同类问题(若有)
+  - **方案 B(不改 components/)**:
+    - 把整个仓库改造为 npm workspaces(根 `package.json` 加 `"workspaces": ["main-app", "visitor", "access", "parking", "components/packages/*"]`),让 npm 自动 hoist 共享依赖到根 `node_modules`
+    - 改完后所有子应用的 `npm install` 都改为在根目录跑 `npm install`
+    - 优点:从根上解决,后续不会再有类似问题;缺点:改动面大,可能影响 access / parking 现有工作流
+- **Owns**(下个 Agent 严格只改这些):
+  - 方案 A 路径:
+    - `components/packages/layout/package.json`
+    - 可能涉及的其他公共包:`components/packages/{table,admin,settings,form,login}/package.json`(如果它们也有同类问题)
+    - `visitor/vite.config.ts`(加 `resolve.dedupe`)
+    - 不动 `access/vite.config.ts` 与 `parking/vite.config.ts`(那是参考子应用,严禁修改)
+  - 方案 B 路径:
+    - 仓库根目录新增 / 改 `package.json`
+    - 各子应用 `package.json` 视情况调整
+    - 改完后需要重新 `npm install` 并提交 root-level lockfile
+- **依赖**: 无(可与 Phase 1 并行)
+- **验收标准**:
+  - 在 visitor/ 下 `npm run build` 通过(无 Rollup resolve 错误)
+  - 在 access/ 与 parking/ 下 `npm run build` 也通过(如果选了方案 A,则只需保证 visitor 通过即可,因为 access / parking 不要求我们去验证 —— 但方案 A / B 都应该是从根上解决,顺带让 access / parking 也通过)
+  - visitor 的 `npm run dev` 仍正常(任何改动都不能破坏 dev 模式)
+- **历史**:
 
 ---
 

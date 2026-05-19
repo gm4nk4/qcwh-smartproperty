@@ -1,27 +1,26 @@
 <template>
-	<component :is="layouts[themeConfig.layout]" />
+	<div>
+		<Layout :showBack="inQiankun" @back="onBack" />
+	</div>
 </template>
 
 <script setup lang="ts" name="layout">
-import { onBeforeMount, onUnmounted, defineAsyncComponent } from 'vue';
+import { onBeforeMount, onUnmounted } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useThemeConfig } from '/@/stores/themeConfig';
 import { Local } from '/@/utils/storage';
 import mittBus from '/@/utils/mitt';
+import { Layout } from '@zhqc-smart/layout';
+import { useQiankun } from '/@/hooks/useQiankun';
 
-// 引入组件
-const layouts: any = {
-	defaults: defineAsyncComponent(() => import('/@/layout/main/defaults.vue')),
-	classic: defineAsyncComponent(() => import('/@/layout/main/classic.vue')),
-	transverse: defineAsyncComponent(() => import('/@/layout/main/transverse.vue')),
-	columns: defineAsyncComponent(() => import('/@/layout/main/columns.vue')),
-};
-
-// 定义变量内容
+const { goMainApp, inQiankun } = useQiankun();
 const storesThemeConfig = useThemeConfig();
 const { themeConfig } = storeToRefs(storesThemeConfig);
 
-// 窗口大小改变时(适配移动端)
+const onBack = () => {
+	goMainApp();
+};
+
 const onLayoutResize = () => {
 	if (!Local.get('oldLayout')) Local.set('oldLayout', themeConfig.value.layout);
 	const clientWidth = document.body.clientWidth;
@@ -38,12 +37,12 @@ const onLayoutResize = () => {
 		});
 	}
 };
-// 页面加载前
+
 onBeforeMount(() => {
 	onLayoutResize();
 	window.addEventListener('resize', onLayoutResize);
 });
-// 页面卸载时
+
 onUnmounted(() => {
 	window.removeEventListener('resize', onLayoutResize);
 });
