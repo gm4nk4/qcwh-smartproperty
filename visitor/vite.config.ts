@@ -14,7 +14,9 @@ const pathResolve = (dir: string) => {
 const alias: Record<string, string> = {
 	'/@': pathResolve('./src/'),
 	'@common': pathResolve('../components/src/'),
-	'vue-i18n': 'vue-i18n/dist/vue-i18n.cjs.js',
+	// 用绝对路径,确保从 `file:` 软链(`@zhqc-smart/*` 公共包)里 import `vue-i18n`
+	// 时也能解析到 visitor 自身 `node_modules/vue-i18n`,而不是从软链目标位置去找。
+	'vue-i18n': pathResolve('./node_modules/vue-i18n/dist/vue-i18n.cjs.js'),
 };
 
 const viteConfig = defineConfig((mode: ConfigEnv) => {
@@ -40,7 +42,12 @@ const viteConfig = defineConfig((mode: ConfigEnv) => {
 			}),
 		],
 		root: process.cwd(),
-		resolve: { alias },
+		resolve: {
+			alias,
+			// 把 `@zhqc-smart/*` 公共包(`file:` 软链)和 visitor 自己共用同一份运行时实例,
+			// 避免 Rollup 在生产构建时从软链目标位置查不到 peer 依赖。
+			dedupe: ['vue', 'vue-router', 'pinia', 'vue-i18n', 'element-plus', '@vueuse/core', 'sortablejs', 'screenfull'],
+		},
 		base: mode.command === 'serve' ? './' : env.VITE_PUBLIC_PATH,
 		optimizeDeps: {
 			include: ['element-plus/es/locale/lang/zh-cn', 'element-plus/es/locale/lang/en'],

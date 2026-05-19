@@ -166,7 +166,7 @@
 
 ## P0-8. 修复 components/packages 软链导致的 `npm run build` 失败(项目级预先存在 bug)
 
-- **状态**: ☐ pending
+- **状态**: ☑ done (PR #TBD, 2026-05-19)
 - **优先级 / 阻塞关系**:
   - **不阻塞 Phase 1 启动**(Phase 1 各 Track 在 dev 模式下都能工作),但**必须在 P2-3 之前完成**
   - **建议尽早做**(可以与 Phase 1 各 Track 并行),否则后续每个 PR 都无法通过 `npm run build` 自检
@@ -218,6 +218,7 @@
   - 在 access/ 与 parking/ 下 `npm run build` 也通过(如果选了方案 A,则只需保证 visitor 通过即可,因为 access / parking 不要求我们去验证 —— 但方案 A / B 都应该是从根上解决,顺带让 access / parking 也通过)
   - visitor 的 `npm run dev` 仍正常(任何改动都不能破坏 dev 模式)
 - **历史**:
+  - 2026-05-19 PR #TBD 选「方案 A 的 visitor 侧子集」(只动 `visitor/vite.config.ts`,**不动 components/**):①把 `vue-i18n` 的 alias 值从相对路径 `'vue-i18n/dist/vue-i18n.cjs.js'` 改成绝对路径 `pathResolve('./node_modules/vue-i18n/dist/vue-i18n.cjs.js')`,这样从 `file:` 软链目标位置 import `vue-i18n` 时也能解析到 visitor 自身的 vue-i18n 安装;②`resolve` 加 `dedupe: ['vue','vue-router','pinia','vue-i18n','element-plus','@vueuse/core','sortablejs','screenfull']`,把 `@zhqc-smart/*` 公共包和 visitor 共用同一份运行时实例。**验证**:与 P0-4 分支合并后(P0-4 提供了公共 layout 需要的 `/@/utils/themeImages` 等 host-side 文件)`npm run build` 通过 exit 0,生成完整 `dist/`(43 个 chunk + 含 gzip);`npm run dev` 仍 HTTP 200 OK 无新错误。**未碰** `components/packages/*/package.json`,因此 `access/`、`parking/` 的构建状态本任务不保证 —— 那两个目录我们禁止修改,留给后续:在它们各自的 `vite.config.ts` 应用同样的 alias/dedupe 改动(或采用方案 B 改造为 workspace)。
 
 ---
 
