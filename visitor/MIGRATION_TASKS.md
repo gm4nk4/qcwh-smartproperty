@@ -66,7 +66,7 @@
 
 ## P0-1. 引入公共组件依赖
 
-- **状态**: ☐ pending
+- **状态**: ☑ done (PR #2, 2026-05-19)
 - **Owns**:
   - `visitor/package.json`(只新增 4 行 file 依赖)
 - **依赖**: 无
@@ -76,6 +76,7 @@
   - `"@zhqc-smart/admin": "file:../components/packages/admin"`
   - `"@zhqc-smart/settings": "file:../components/packages/settings"`
 - **历史**:
+  - 2026-05-19 PR #2 在 `visitor/package.json` dependencies 中加入 `@zhqc-smart/{admin,layout,settings,table}` 4 个 file 依赖,本地 `npm install` 验证 4 个包均被正确软链到 `components/packages/*`
 
 ## P0-2. 接入 qiankun 通信
 
