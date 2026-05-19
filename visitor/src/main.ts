@@ -20,6 +20,7 @@ import { Splitpanes, Pane } from 'splitpanes';
 import 'splitpanes/dist/splitpanes.css';
 
 import { renderWithQiankun, qiankunWindow, type QiankunProps } from 'vite-plugin-qiankun/dist/helper';
+import { setActions, initGlobalStateListener, destroyGlobalStateListener } from '/@/qiankun/actions';
 
 let app: ReturnType<typeof createApp> | null = null;
 
@@ -76,10 +77,17 @@ renderWithQiankun({
 	},
 	mount(props) {
 		console.log('[asset] mount', props);
+		// 1. 注入主应用传递的 actions 对象,供 useQiankun / getActions 使用
+		setActions(props as any);
+		// 2. 初始化全局状态监听(单例模式,只注册一次)
+		initGlobalStateListener();
+		// 3. 渲染 Vue 应用
 		render(props);
 	},
 	unmount() {
 		console.log('[asset] unmount');
+		// 销毁全局状态监听,防止内存泄漏
+		destroyGlobalStateListener();
 		if (app) {
 			app.unmount();
 			app = null;

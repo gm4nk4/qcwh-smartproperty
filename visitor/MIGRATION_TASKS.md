@@ -80,7 +80,7 @@
 
 ## P0-2. 接入 qiankun 通信
 
-- **状态**: ☐ pending
+- **状态**: ☑ done (PR #4, 2026-05-19)
 - **Owns**:
   - `visitor/src/qiankun/actions.ts`(新增,从 `access/src/qiankun/actions.ts` 复制)
   - `visitor/src/qiankun/communication.ts`(新增,从 access 复制)
@@ -88,6 +88,7 @@
   - `visitor/src/main.ts`(改:引入 `setActions/initGlobalStateListener/destroyGlobalStateListener`,`mount/unmount` 中调用)
 - **依赖**: P0-1
 - **历史**:
+  - 2026-05-19 PR #4 从 access 同步 `qiankun/actions.ts`、`qiankun/communication.ts`、`hooks/useQiankun.ts` 三个文件,并在 `visitor/src/main.ts` 的 `mount` 钩子里加入 `setActions(props) + initGlobalStateListener()`、`unmount` 钩子里加入 `destroyGlobalStateListener()`。本地 `npm run build` 通过(2476 modules,32.5s,无错误)
 
 ## P0-3. 接入公共 Layout(实现「返回统一门户」按钮)
 
