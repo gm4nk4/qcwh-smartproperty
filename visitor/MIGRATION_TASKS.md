@@ -101,7 +101,7 @@
 
 ## P0-4. 同步主题工具与 stores
 
-- **状态**: ☐ pending
+- **状态**: ☑ done (PR #TBD, 2026-05-19)
 - **Owns**:
   - `visitor/src/utils/themeSkin.ts`(新增,从 access 复制)
   - `visitor/src/utils/themeImages.ts`(新增,从 access 复制)
@@ -109,11 +109,15 @@
   - `visitor/src/utils/themeSidebar.ts`(新增,从 access 复制)
   - `visitor/src/utils/resolveComponent.ts`(新增,从 access 复制)
   - `visitor/src/theme/config/skin.ts`(新增,从 access 复制)
+  - `visitor/src/theme/config/index.js`(新增,从 access 复制;`themeSkin.ts` 直接依赖,实施时扩展进 Owns)
   - `visitor/src/theme/index.scss`(必要时对齐 access 的差异)
   - `visitor/src/stores/themeConfig.ts`(对齐 access 的基于 skin 的体系)
+  - `visitor/src/types/global.d.ts`(加 1 行 `declare type ThemeSkin = 'light-blue' | 'light-green'`;实施时扩展进 Owns,因为 themeSkin.ts 强依赖全局类型)
+  - `visitor/src/types/pinia.d.ts`(在 `ThemeConfigState.themeConfig` 类型里加 1 行 `skin: ThemeSkin;`;实施时扩展进 Owns)
   - `visitor/src/App.vue`(引入 `applyThemeCssVars / applyThemeMode`)
 - **依赖**: P0-1
 - **历史**:
+  - 2026-05-19 PR #TBD 从 access 复制 6 个主题工具文件(`utils/{themeSkin,themeImages,themeLayoutIcons,themeSidebar,resolveComponent}.ts` + `theme/config/{skin.ts,index.js}`),用 access 的版本替换 `stores/themeConfig.ts`(改为基于 skin 的工厂模式),在 `types/{global,pinia}.d.ts` 加 `ThemeSkin` 全局类型与 `themeConfig.skin` 字段,`App.vue` 引入 `applyThemeCssVars/applyThemeMode`、在 `onMounted` 钩子里调用同步主题 CSS 变量与深浅色模式。`npm run dev` 启动 OK(HTTP 200,无错误);`npm run build` 仍受 P0-8 影响,与本任务无关。`theme/index.scss` 经 diff 后 access 与 visitor 内容差异不影响 P0-4 目标,本 PR 未动。
 
 ## P0-5. 一次性占位路由(关键防冲突任务)
 

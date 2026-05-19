@@ -15,6 +15,7 @@ import other from '/@/utils/other';
 import { Local, Session } from '/@/utils/storage';
 import mittBus from '/@/utils/mitt';
 import setIntroduction from '/@/utils/setIconfont';
+import { applyThemeCssVars, applyThemeMode } from '/@/utils/themeSkin';
 
 // 引入组件
 const LockScreen = defineAsyncComponent(() => import('/@/layout/lockScreen/index.vue'));
@@ -28,6 +29,14 @@ const route = useRoute();
 const stores = useTagsViewRoutes();
 const storesThemeConfig = useThemeConfig();
 const { themeConfig } = storeToRefs(storesThemeConfig);
+
+const syncThemeCssVars = () => {
+	applyThemeCssVars(themeConfig.value.skin, {
+		isDark: themeConfig.value.isIsDark,
+		primary: themeConfig.value.primary,
+	});
+	Local.set('themeConfigStyle', document.documentElement.style.cssText);
+};
 
 // 设置锁屏时组件显示隐藏
 const setLockScreen = computed(() => {
@@ -61,8 +70,13 @@ onMounted(() => {
 		// 获取缓存中的布局配置
 		if (Local.get('themeConfig')) {
 			storesThemeConfig.setThemeConfig({ themeConfig: Local.get('themeConfig') });
+			Local.set('themeConfig', themeConfig.value);
+		}
+		if (Local.get('themeConfigStyle')) {
 			document.documentElement.style.cssText = Local.get('themeConfigStyle');
 		}
+		syncThemeCssVars();
+		applyThemeMode(themeConfig.value.skin, themeConfig.value.isIsDark);
 		// 获取缓存中的全屏配置
 		if (Session.get('isTagsViewCurrenFull')) {
 			stores.setCurrenFullscreen(Session.get('isTagsViewCurrenFull'));
