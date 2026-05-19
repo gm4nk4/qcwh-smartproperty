@@ -46,7 +46,7 @@ const viteConfig = defineConfig((mode: ConfigEnv) => {
 			alias,
 			// 把 `@zhqc-smart/*` 公共包(`file:` 软链)和 visitor 自己共用同一份运行时实例,
 			// 避免 Rollup 在生产构建时从软链目标位置查不到 peer 依赖。
-			dedupe: ['vue', 'vue-router', 'pinia', 'vue-i18n', 'element-plus', '@vueuse/core', 'sortablejs', 'screenfull'],
+			dedupe: ['vue', 'vue-router', 'pinia', 'vue-i18n', 'element-plus', '@element-plus/icons-vue', '@vueuse/core', 'sortablejs', 'screenfull'],
 		},
 		base: mode.command === 'serve' ? './' : env.VITE_PUBLIC_PATH,
 		optimizeDeps: {

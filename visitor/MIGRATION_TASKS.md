@@ -225,6 +225,7 @@
   - visitor 的 `npm run dev` 仍正常(任何改动都不能破坏 dev 模式)
 - **历史**:
   - 2026-05-19 PR #TBD 选「方案 A 的 visitor 侧子集」(只动 `visitor/vite.config.ts`,**不动 components/**):①把 `vue-i18n` 的 alias 值从相对路径 `'vue-i18n/dist/vue-i18n.cjs.js'` 改成绝对路径 `pathResolve('./node_modules/vue-i18n/dist/vue-i18n.cjs.js')`,这样从 `file:` 软链目标位置 import `vue-i18n` 时也能解析到 visitor 自身的 vue-i18n 安装;②`resolve` 加 `dedupe: ['vue','vue-router','pinia','vue-i18n','element-plus','@vueuse/core','sortablejs','screenfull']`,把 `@zhqc-smart/*` 公共包和 visitor 共用同一份运行时实例。**验证**:与 P0-4 分支合并后(P0-4 提供了公共 layout 需要的 `/@/utils/themeImages` 等 host-side 文件)`npm run build` 通过 exit 0,生成完整 `dist/`(43 个 chunk + 含 gzip);`npm run dev` 仍 HTTP 200 OK 无新错误。**未碰** `components/packages/*/package.json`,因此 `access/`、`parking/` 的构建状态本任务不保证 —— 那两个目录我们禁止修改,留给后续:在它们各自的 `vite.config.ts` 应用同样的 alias/dedupe 改动(或采用方案 B 改造为 workspace)。
+  - 2026-05-19 PR #TBD 跟进:Track B 首个 PR 引入 `@zhqc-smart/table` 时,build 报 `Rollup failed to resolve import "@element-plus/icons-vue" from components/packages/table/src/ConfigurableTableWithForm.vue`,根因同上(`@element-plus/icons-vue` 是公共包 `dependencies` 但宿主 import 时需要 dedupe 走 visitor 自身的安装)。修复:在 `visitor/vite.config.ts` `dedupe` 数组里追加 `'@element-plus/icons-vue'`。本地 `npm run build` 验证 exit 0(2497 模块 / 完整 dist)、`npm run dev` HTTP 200 OK。
 
 ---
 
