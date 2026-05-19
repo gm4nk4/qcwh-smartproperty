@@ -238,11 +238,12 @@
 
 ### B1. 预约记录
 
-- **状态**: ☐ pending
+- **状态**: ☑ done (PR #TBD, 2026-05-19)
 - **Owns**: `visitor/src/views/visitor/appointment-records/**`
 - **依赖**: P0-1, P0-2, P0-3
 - **内容**: 重构 `index.vue`,自研 `<el-table>` + 查询面板替换为 `ConfigurableTableWithForm`,保留列、查询字段、分页、操作列、详情弹窗
 - **历史**:
+  - 2026-05-19 PR #TBD visitor 预约记录列表页接入 `ConfigurableTableWithForm`(替换自研 `<el-table>` + 查询面板,保留列/查询字段/分页/操作列/详情弹窗;状态列改用 `statusSlot` 渲染 `status-tag`)
 
 ### B2. 通行记录
 
