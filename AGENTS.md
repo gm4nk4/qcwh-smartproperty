@@ -18,9 +18,9 @@
 | `visitor/` | **当前开发主战场**:访客管理子应用 | **必须改** | 所有迁移/样式调整都在这里;按 `visitor/MIGRATION_TASKS.md` 的 Phase/Track 推进 |
 | `access/` | 参考子应用:门禁/统一门户/权限 | **❌ 严禁修改** | 仅用于参考实现 |
 | `parking/` | 参考子应用:停车/能耗/告警 | **❌ 严禁修改** | 仅用于参考实现 |
-| `components/` | 公共组件库 `@zhqc-smart/{layout,table,admin,settings,form,login}` | **❌ 严禁修改** | visitor 通过 `file:` 依赖引入使用 |
+| `components/` | 公共组件库 `@zhqc-smart/{layout,table,admin,settings,form,login}` | 可改,只在必须改时更改,且与用户沟通 | visitor 通过 `file:` 依赖引入使用 |
 
-> 这一边界来自仓库根 README.md:**"其他均为参考项目(且不允许更改)"**。任何对 access/parking/components 的改动都会被驳回。
+> 这一边界来自仓库根 README.md:**"其他均为参考项目(且不允许更改)"**。任何对 access/parking 的改动都会被驳回。
 
 ## 3. 多 Agent 并行工作模型(核心)
 
