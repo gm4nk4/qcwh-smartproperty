@@ -517,6 +517,35 @@
 - **历史**:
   - 2026-05-20 PR #TBD `visitor/src/router/route.ts` 4 条 settings leaf 路由补 `level: 2`，对齐 access mockRoute 的 sub-item 渲染约定，修复「设置」分组选中态 marker 条贴文字左侧的样式问题
 
+## P2-9. 访客总览「访客到访趋势」堆叠柱状图视觉打磨
+
+- **状态**: 🟡 in-progress (P2-9, devin/<unix>-P2-9-visitor-overview-trend-chart-polish)
+- **Owns**:
+  - `visitor/src/views/visitor/overview/useBizProcess.ts`（仅 `buildTrendChartOption` 函数）
+  - `visitor/MIGRATION_TASKS.md`（仅本任务章节）
+- **依赖**: B5（访客总览页骨架已落地）
+- **背景**: 用户反馈访客总览页「访客到访趋势」堆叠柱状图视觉不够精致 —— 每个柱子分段都有上下圆角，堆叠后像一串"胶囊"，柱体效果不够干净。其余面板标题 / 副标题 / 图例 / 日期等图表外文字不动。
+- **根因**: 原 `series.itemStyle.borderRadius = [6, 6, 0, 0]` 是 series 维度的全局配置，ECharts 会对该 series 的**每一段**都应用顶部圆角；多段堆叠后每段顶部都圆角 → 视觉上变成胶囊堆叠。
+- **修复**: 把圆角从 series 维度下沉到 data 维度，仅给"该 x 位置最顶端非零段"加 `[8,8,0,0]` 顶部圆角，其余段都是 `[0,0,0,0]` 矩形对齐拼接：
+  - 预计算二维数据矩阵 `dataMatrix[seriesIndex][xIndex]` 和"每个 x 上最顶非零 series 下标" `topSeriesPerX[xIndex]`
+  - `series.data` 改为对象数组 `{ value, itemStyle: { borderRadius, borderColor, borderWidth } }`
+  - `borderColor: '#ffffff'` + `borderWidth: 1`（仅 `value > 0` 时）给相邻段制造 1px 细缝，避免相邻同色段挤在一起糊成一片
+  - 顶部圆角从 `6` 调到 `8`，柱体上沿更圆润
+  - `barWidth` 从 `26` 收窄到 `20`，柱子更挺拔
+  - `tooltip.axisPointer.shadowStyle` 加 `rgba(99, 102, 241, 0.06)` 淡紫色提示区
+  - `legend.itemGap: 18` 让图例项之间留出更多呼吸感
+  - `emphasis.itemStyle` 加 `shadowBlur: 14` + `shadowOffsetY: 4` + `shadowColor: 'rgba(15, 23, 42, 0.18)'`，hover 当前 series 时整列柱体浮起一层柔光
+- **保持不动**:
+  - 企业身份色 `enterprise.color`（API mock 提供，同时被趋势表格的颜色点引用，保持源头一致性）
+  - 图表外的标题 / 副标题 / 工具栏 / 「访客数据概览」/ 表格 / 各 metric card
+  - 公共 layout / 主题 token / 任何样式文件
+- **校验**（本机由用户跑，VM 不跑 build / install）:
+  - 「访客到访趋势」柱状图：每根柱子整体看起来像一条只有顶部圆角的连贯长条，不再有胶囊堆叠感；相邻段之间有清晰的细缝；hover 时浮起柔光
+  - 顶部 metric 卡片、「访客数据概览」、「各企业到访明细（最近5天）」表格、日期选择器、指标切换 segmented 都不变
+  - `npm run lint:eslint` 0 error（沿用 P2-3 基线）
+- **历史**:
+  - 2026-05-20 PR #TBD `visitor/src/views/visitor/overview/useBizProcess.ts` 调整 `buildTrendChartOption`：堆叠柱顶圆角下沉到 data 级别仅在最顶段生效；加 1px 白色 border 分段；收窄柱宽到 20；图例间距、tooltip 提示色、hover 阴影一同微调
+
 ## P2-3. 最终 lint + build
 
 - **状态**: ☑ done (PR #TBD, 2026-05-20)
