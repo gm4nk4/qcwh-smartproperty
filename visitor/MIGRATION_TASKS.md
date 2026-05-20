@@ -272,11 +272,12 @@
 
 ### B5. 访客总览
 
-- **状态**: ☐ pending
+- **状态**: ☑ done (PR #TBD, 2026-05-20)
 - **Owns**: `visitor/src/views/visitor/overview/**`
 - **依赖**: P0-3, P0-4
 - **内容**: 卡片/图表样式对齐 access `home/index.vue`,复用 `dashboardVars` / 主题 CSS 变量
 - **历史**:
+  - 2026-05-20 PR #TBD 把 `visitor/src/views/visitor/overview/index.vue` 的卡片/面板样式对齐 access `home/index.vue`:①外层套 `el-scrollbar` + `home-dashboard` 容器,新增 `dashboardVars` computed 注入 `--dashboard-primary/-rgb/-deep/-soft/-softer`、`--dashboard-gradient-start/-end`、`--dashboard-chart-0..4`、`--dashboard-title-bar-color/-shadow` 等 CSS 变量(从 P0-4 同步过来的 `useThemeConfig` store + `/@/utils/theme` 的 `useChangeColor`/`hexToRgb`/`getLightColor`/`getDarkColor` 取值,light-blue / light-green 皮肤自动切换);②5 个指标卡改用 access `metric-card` 形态(白底 + 主题色边框/阴影 + 主题色图标底色),原先 5 种硬编码 pink/blue/green/violet/amber 替换为 `--dashboard-primary` + 4 个 `--dashboard-chart-*` 派生的 5 档轮换主题色;③访客数据概览/趋势/明细三块统一改成 access `panel-card` 形态(白底 + 主题色描边 + 标题前 `panel-card__bar` 蓝条 + `--theme-text-system / -primaryTitle / -dataAssist` 文本色变量);④`panel-card__toolbar` 内的 `el-segmented` / `el-date-picker` 用 deep 样式套上主题 primary RGB 圆角胶囊;⑤趋势 echarts 配置 (`useBizProcess.ts`) 与 mock 数据/业务逻辑保持不动,仅改样式表与模板结构。**校验**: `npm install` OK;`npm run dev` HTTP 200 OK,SFC 编译成功,无新的 vite 报错(只有预先就有的 `auth/code/image` 无后端导致的 proxy ETIMEDOUT,与本任务无关);`npx prettier --write src/views/visitor/overview/` 通过
 
 ### B6. 园区访客管理说明
 
