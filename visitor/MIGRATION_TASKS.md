@@ -311,17 +311,19 @@
 
 ### C4. 岗位管理
 
-- **状态**: ☐ pending
+- **状态**: 🚫 cancelled (2026-05-20, 需求未整理)
 - **Owns**: `visitor/src/views/permission/position/**`
 - **依赖**: P0-5, C0
 - **历史**:
+  - 2026-05-20 用户决议：本期不迁移。P0-5 占位路由与占位 index.vue 保留(以免反复增删路由表)，后续需求明确后可重启本任务
 
 ### C5. 空间管理
 
-- **状态**: ☐ pending
+- **状态**: 🚫 cancelled (2026-05-20, 需求未整理)
 - **Owns**: `visitor/src/views/permission/space/**`
 - **依赖**: P0-5, C0
 - **历史**:
+  - 2026-05-20 用户决议：本期不迁移。P0-5 占位路由与占位 index.vue 保留
 
 ### C6. 组织管理
 
@@ -333,31 +335,44 @@
 
 ### C7. 统一门户 — 子应用管理
 
-- **状态**: ☐ pending
+- **状态**: 🚫 cancelled (2026-05-20, 需求未整理)
 - **Owns**: `visitor/src/views/portal/application/**`
 - **依赖**: P0-5, C0
 - **历史**:
+  - 2026-05-20 用户决议：本期不迁移。P0-5 占位路由与占位 index.vue 保留
 
 ### C8. 统一门户 — AI 工具中心
 
-- **状态**: ☐ pending
+- **状态**: 🚫 cancelled (2026-05-20, 需求未整理)
 - **Owns**: `visitor/src/views/portal/ai/**`
 - **依赖**: P0-5, C0
 - **内容**: 包含 `components/ModelsManage.vue` 等
 - **历史**:
+  - 2026-05-20 用户决议：本期不迁移。P0-5 占位路由与占位 index.vue 保留
 
 ### C9. 统一门户 — 应用分类
 
-- **状态**: ☐ pending
+- **状态**: 🚫 cancelled (2026-05-20, 需求未整理)
 - **Owns**: `visitor/src/views/portal/category/**`
 - **依赖**: P0-5, C0
 - **历史**:
+  - 2026-05-20 用户决议：本期不迁移。P0-5 占位路由与占位 index.vue 保留
 
 ### C10. 统一门户 — 工作台配置
 
-- **状态**: ☐ pending
+- **状态**: 🚫 cancelled (2026-05-20, 需求未整理)
 - **Owns**: `visitor/src/views/portal/workbench/**`
 - **依赖**: P0-5, C0
+- **历史**:
+  - 2026-05-20 用户决议：本期不迁移。P0-5 占位路由与占位 index.vue 保留
+
+### C11. 系统设置 — 菜单管理
+
+- **状态**: ☐ pending
+- **Owns**: `visitor/src/views/set/menu/**`（新增）、`visitor/src/router/route.ts` 加一行 `/set/menu`
+- **依赖**: P0-5, C0
+- ⚠️ 本任务**例外**地需要改 `route.ts`（加一行 `/set/menu` 路由，P0-5 未占位），同 D4 例外。为避免与其他 PR 撞期，**由父会话集中处理**，不拆子会话。
+- **内容**: 从 `access/src/views/set/menu/` 复制整套到 `visitor/src/views/set/menu/`（包括 `index.vue` 以及 `mock.ts` / `type.ts` / `components/` 等存在的文件），保留 mock、不接后端。同时在 `visitor/src/router/route.ts` 的 `dynamicRoutes` 中追加一条 `/set/menu` 路由。
 - **历史**:
 
 ### C0. 共享 hook(`useThemeOrUserInfo`) — Track C 公共前置
