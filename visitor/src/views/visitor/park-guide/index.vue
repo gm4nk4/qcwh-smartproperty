@@ -140,8 +140,9 @@ onMounted(() => {
 		padding: 20px;
 		display: flex;
 		flex-direction: column;
-		gap: 18px;
-		background: #f8fafc;
+		gap: 16px;
+		background: radial-gradient(circle at top left, rgba(59, 130, 246, 0.05), transparent 26%),
+			radial-gradient(circle at top right, rgba(14, 165, 233, 0.05), transparent 24%), #f8fafc;
 		border-radius: 22px;
 		border: 1px solid #eef2f7;
 		overflow: auto;
@@ -151,9 +152,9 @@ onMounted(() => {
 	&__preview-card,
 	&__editor-panel,
 	&__preview-panel {
-		padding: 20px;
+		padding: 18px;
 		border-radius: 20px;
-		background: #fff;
+		background: rgba(255, 255, 255, 0.95);
 		border: 1px solid rgba(226, 232, 240, 0.9);
 		box-shadow: 0 12px 34px rgba(15, 23, 42, 0.04);
 	}
@@ -204,7 +205,7 @@ onMounted(() => {
 	&__workspace {
 		display: grid;
 		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-		gap: 18px;
+		gap: 16px;
 	}
 
 	&__content {
@@ -309,7 +310,7 @@ onMounted(() => {
 	text-decoration: none;
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 1440px) {
 	.visitor-park-guide {
 		&__workspace {
 			grid-template-columns: 1fr;
@@ -317,7 +318,7 @@ onMounted(() => {
 	}
 }
 
-@media (max-width: 768px) {
+@media (max-width: 992px) {
 	.visitor-park-guide {
 		&__body {
 			padding: 16px;
@@ -326,7 +327,11 @@ onMounted(() => {
 		&__hero {
 			flex-direction: column;
 		}
+	}
+}
 
+@media (max-width: 640px) {
+	.visitor-park-guide {
 		&__title {
 			font-size: 28px;
 		}
