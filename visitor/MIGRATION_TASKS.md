@@ -238,51 +238,56 @@
 
 ### B1. 预约记录
 
-- **状态**: ☑ done (PR #TBD, 2026-05-19)
+- **状态**: ☑ done (PR #12, 2026-05-19)
 - **Owns**: `visitor/src/views/visitor/appointment-records/**`
 - **依赖**: P0-1, P0-2, P0-3
 - **内容**: 重构 `index.vue`,自研 `<el-table>` + 查询面板替换为 `ConfigurableTableWithForm`,保留列、查询字段、分页、操作列、详情弹窗
 - **历史**:
-  - 2026-05-19 PR #TBD visitor 预约记录列表页接入 `ConfigurableTableWithForm`(替换自研 `<el-table>` + 查询面板,保留列/查询字段/分页/操作列/详情弹窗;状态列改用 `statusSlot` 渲染 `status-tag`)
+  - 2026-05-19 PR #12 visitor 预约记录列表页接入 `ConfigurableTableWithForm`(替换自研 `<el-table>` + 查询面板,保留列/查询字段/分页/操作列/详情弹窗;状态列改用 `statusSlot` 渲染 `status-tag`)
 
 ### B2. 通行记录
 
-- **状态**: ☐ pending
+- **状态**: ☑ done (PR #16, 2026-05-20)
 - **Owns**: `visitor/src/views/visitor/access-records/**`
 - **依赖**: P0-1, P0-2, P0-3
 - **历史**:
+  - 2026-05-20 PR #16 通行记录列表页接入 ConfigurableTableWithForm,移除自研查询面板/表格/分页,保留详情弹窗
 
 ### B3. 黑名单管理
 
-- **状态**: ☐ pending
+- **状态**: ☑ done (PR #14, 2026-05-20)
 - **Owns**: `visitor/src/views/visitor/blacklist/**`
 - **依赖**: P0-1, P0-2, P0-3
 - **内容**: 接入 `ConfigurableTableWithForm`,保留"新增/移除"及新增弹窗
 - **历史**:
+  - 2026-05-20 PR #14 黑名单管理页接入 `ConfigurableTableWithForm`,`#tableActions` 槽位放新增按钮,操作列保留移除,新增弹窗保留
 
 ### B4. 访客配置
 
-- **状态**: ☐ pending
+- **状态**: ☑ done (PR #17, 2026-05-20)
 - **Owns**: `visitor/src/views/visitor/config/**`
 - **依赖**: P0-1, P0-2, P0-3
 - **内容**: 设备表格改为 `ConfigurableTable`(无查询面板)
 - **历史**:
+  - 2026-05-20 PR #17 设备表格接入 `@zhqc-smart/table` 的 `ConfigurableTable`,不引入查询面板
 
 ### B5. 访客总览
 
-- **状态**: ☐ pending
+- **状态**: ☑ done (PR #19, 2026-05-20)
 - **Owns**: `visitor/src/views/visitor/overview/**`
 - **依赖**: P0-3, P0-4
 - **内容**: 卡片/图表样式对齐 access `home/index.vue`,复用 `dashboardVars` / 主题 CSS 变量
 - **历史**:
+  - 2026-05-20 PR #19 把 `visitor/src/views/visitor/overview/index.vue` 的卡片/面板样式对齐 access `home/index.vue`:①外层套 `el-scrollbar` + `home-dashboard` 容器,新增 `dashboardVars` computed 注入 `--dashboard-primary/-rgb/-deep/-soft/-softer`、`--dashboard-gradient-start/-end`、`--dashboard-chart-0..4`、`--dashboard-title-bar-color/-shadow` 等 CSS 变量(从 P0-4 同步过来的 `useThemeConfig` store + `/@/utils/theme` 的 `useChangeColor`/`hexToRgb`/`getLightColor`/`getDarkColor` 取值,light-blue / light-green 皮肤自动切换);②5 个指标卡改用 access `metric-card` 形态(白底 + 主题色边框/阴影 + 主题色图标底色),原先 5 种硬编码 pink/blue/green/violet/amber 替换为 `--dashboard-primary` + 4 个 `--dashboard-chart-*` 派生的 5 档轮换主题色;③访客数据概览/趋势/明细三块统一改成 access `panel-card` 形态(白底 + 主题色描边 + 标题前 `panel-card__bar` 蓝条 + `--theme-text-system / -primaryTitle / -dataAssist` 文本色变量);④`panel-card__toolbar` 内的 `el-segmented` / `el-date-picker` 用 deep 样式套上主题 primary RGB 圆角胶囊;⑤趋势 echarts 配置 (`useBizProcess.ts`) 与 mock 数据/业务逻辑保持不动,仅改样式表与模板结构。**校验**: `npm install` OK;`npm run dev` HTTP 200 OK,SFC 编译成功,无新的 vite 报错(只有预先就有的 `auth/code/image` 无后端导致的 proxy ETIMEDOUT,与本任务无关);`npx prettier --write src/views/visitor/overview/` 通过
 
 ### B6. 园区访客管理说明
 
-- **状态**: ☐ pending
+- **状态**: ☑ done (PR #15, 2026-05-20)
 - **Owns**: `visitor/src/views/visitor/park-guide/**`
 - **依赖**: P0-3
 - **内容**: 样式微调 + 栅格对齐
 - **历史**:
+  - 2026-05-20 PR #15 对齐 visitor 其他页面样式规范:body 背景加双层 radial-gradient,gap 18→16px;面板 padding 20→18px、background `#fff`→`rgba(255,255,255,0.95)`;workspace gap 18→16px;媒体查询断点 1200/768 → 1440/992/640 与其他 visitor 页面对齐
 
 ## Track C — 「统一门户 + 统一权限」模块迁移
 
@@ -357,21 +362,23 @@
 
 ### C0. 共享 hook(`useThemeOrUserInfo`) — Track C 公共前置
 
-- **状态**: ☐ pending
+- **状态**: ☑ done (PR #10, 2026-05-19)
 - **Owns**: `visitor/src/hooks/useThemeOrUserInfo.ts`(新增)
 - **依赖**: P0-1, P0-4
 - **内容**: 从 `access/src/hooks/useThemeOrUserInfo.ts` 复制。**C2-C10 多个 PR 都会依赖它,所以必须先于这些任务合并**。建议放在 Phase 0 末尾或作为 Phase 1 第一个被领取的任务
 - **历史**:
+  - 2026-05-19 PR #10 新增 `visitor/src/hooks/useThemeOrUserInfo.ts`(从 `access/src/hooks/useThemeOrUserInfo.ts` 1:1 复制,13 行),解锁 Track C 的 C2-C10 任务
 
 ## Track D — 边角(选做)
 
 ### D3. admin 用户/角色页面同步
 
-- **状态**: ☐ pending
+- **状态**: ☑ done (PR #13, 2026-05-20)
 - **Owns**: `visitor/src/views/admin/user/**`
 - **依赖**: P0-1, P0-3
 - **内容**: 把 access 的 `UserAuthDialog.vue`、`userDetail.vue`、`mock.ts`、`type.ts`、`components/` 复制过来,使后台 admin 模块与 access 一致
 - **历史**:
+  - 2026-05-20 PR #13 从 `access/src/views/admin/user/` 复制 `UserAuthDialog.vue`、`userDetail.vue`、`mock.ts`、`type.ts`、`components/{PermissionPanel.vue,UserInfoPanel.vue}` 到 `visitor/src/views/admin/user/` 同名路径,内容与 access 完全一致(diff 无差异)。所有 import 均为相对路径(`./mock`、`./type`、`./components/*`)或第三方包(`vue`、`element-plus`、`@element-plus/icons-vue`),无 `/@/` 别名依赖,visitor 已有相同版本的 element-plus 2.13.1 + @element-plus/icons-vue 2.3.2,无需补充依赖。未改 `index.vue`/`form.vue`/`personal.vue`/`i18n/`(本任务范围仅同步上述新增文件)。本地 `npx prettier --write src/views/admin/user/` 通过;`npm run dev` HTTP 200。
 
 ### D4. 主题图片库
 
@@ -383,10 +390,11 @@
 
 ### D5. 登录页对齐
 
-- **状态**: ☐ pending
+- **状态**: ☑ done (PR #18, 2026-05-20)
 - **Owns**: `visitor/src/views/login/**`
 - **依赖**: P0-1, P0-4
 - **历史**:
+  - 2026-05-20 PR #18 把 `visitor/src/views/login/index.vue` 重写为 access 的 `.login-page__*` 结构（brand header / hero / panel / card / footer），引入 `useThemeImage('loginBackground')` 与 `useThemeImage('brandBadge')` 主题图。`visitor/src/views/login/component/password.vue` 改为 access 同款 `login-field` + `login-field__label` 表单(去掉 prefix 图标,新增 `login-password-toggle` 显隐密码按钮,验证码改用 `login-verify-row` 网格);保留 visitor 既有的 `isQiankun` 验证码 URL 逻辑(不动认证逻辑)。新增 `visitor/src/views/login/i18n/{zh-cn,en}.ts` 补齐 `page.welcome/subtitle/username/password/imageCode` i18n 键(走自动 glob 注入,不动 `i18n/lang/*` 与 `i18n/pages/login/*`)。`visitor/src/theme/login.scss` 不在 Owns 之内,所有新结构样式以未 scoped `<style lang="scss">` 块内联在 `index.vue` 中,与原有旧布局类名(`.login-container/.wave/.img/.login-box`)互不冲突。`mobile.vue` 与 `register.vue` 当前已与 access 一致,保持原样未改动。`npm run dev` 验证通过(HTTP 200,`/#/login` 可访问)。
 
 ---
 
