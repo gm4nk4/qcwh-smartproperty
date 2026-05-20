@@ -131,9 +131,14 @@ const visitorRoutes: Array<RouteRecordRaw> = [
 // 设置（系统设置）路由：用户管理 / 角色管理 / 组织管理 / 菜单管理
 // menuRoutes 中会以「设置」为父菜单把这 4 条合并展示，
 // dynamicRoutes 中保持扁平以避免 vue-router 嵌套注册。
+//
+// 注意：visitor 子应用在 qiankun 主应用下挂载于 `/visitor` 前缀（见
+// main-app/src/config/apps.ts `routePath: '/visitor'`）。子应用使用 hash
+// 路由，因此所有路由 path **必须**以 `/visitor/` 起始，否则跳转后主应用
+// qiankun activeRule 不再匹配，会把 visitor 卸载并落到 404。
 // ---------------------------------------------------------------------------
 const userRoute: RouteRecordRaw = {
-	path: '/permission/user',
+	path: '/visitor/permission/user',
 	name: 'permission.user',
 	component: () => import('/@/views/permission/user/index.vue'),
 	meta: {
@@ -149,7 +154,7 @@ const userRoute: RouteRecordRaw = {
 };
 
 const roleRoute: RouteRecordRaw = {
-	path: '/permission/role',
+	path: '/visitor/permission/role',
 	name: 'permission.role',
 	component: () => import('/@/views/permission/role/index.vue'),
 	meta: {
@@ -165,7 +170,7 @@ const roleRoute: RouteRecordRaw = {
 };
 
 const organizationRoute: RouteRecordRaw = {
-	path: '/permission/organization',
+	path: '/visitor/permission/organization',
 	name: 'permission.organization',
 	component: () => import('/@/views/permission/organization/index.vue'),
 	meta: {
@@ -181,7 +186,7 @@ const organizationRoute: RouteRecordRaw = {
 };
 
 const menuRoute: RouteRecordRaw = {
-	path: '/set/menu',
+	path: '/visitor/set/menu',
 	name: 'set.menu',
 	component: () => import('/@/views/set/menu/index.vue'),
 	meta: {
@@ -200,7 +205,7 @@ const settingsRoutes: Array<RouteRecordRaw> = [userRoute, roleRoute, organizatio
 
 // 个人中心（隐藏）
 const personalRoute: RouteRecordRaw = {
-	path: '/personal',
+	path: '/visitor/personal',
 	name: 'router.personal',
 	component: () => import('/@/views/admin/user/personal.vue'),
 	meta: {
@@ -230,7 +235,7 @@ export const dynamicRoutes: Array<RouteRecordRaw> = [
 export const menuRoutes: Array<RouteRecordRaw> = [
 	...visitorRoutes,
 	{
-		path: '/set',
+		path: '/visitor/set',
 		name: 'set',
 		meta: {
 			title: '设置',
