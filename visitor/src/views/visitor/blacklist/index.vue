@@ -1,77 +1,26 @@
 <template>
 	<div class="layout-padding visitor-blacklist">
-		<div class="layout-padding-auto layout-padding-view visitor-blacklist__body">
-			<section class="visitor-blacklist__search">
-				<div class="visitor-blacklist__search-grid">
-					<div class="visitor-blacklist__field" v-for="item in queryFieldConfigs" :key="item.key">
-						<div class="visitor-blacklist__field-label">{{ item.label }}</div>
-						<component
-							:is="item.component"
-							v-bind="item.props"
-							:model-value="formData[item.field]"
-							@update:modelValue="(value: unknown) => handleQueryValueChange(item.field, value)"
-						>
-							<template v-if="item.component === 'el-select'">
-								<el-option v-for="option in item.options" :key="option.value" :label="option.label" :value="option.value" />
-							</template>
-						</component>
-					</div>
-
-					<div class="visitor-blacklist__actions">
-						<el-button type="primary" @click="handleSearch">
-							<el-icon class="mr5">
-								<ele-Search />
-							</el-icon>
-							查询
-						</el-button>
-						<el-button @click="handleReset">
-							<el-icon class="mr5">
-								<ele-Refresh />
-							</el-icon>
-							重置
-						</el-button>
-					</div>
-
-					<div class="visitor-blacklist__create-action">
-						<el-button type="primary" @click="openCreateDialog">
-							<el-icon class="mr5">
-								<ele-Plus />
-							</el-icon>
-							新增
-						</el-button>
-					</div>
-				</div>
-			</section>
-
-			<section class="visitor-blacklist__table-panel" v-loading="pageState.loading">
-				<el-table :data="tableRows" class="visitor-blacklist__table" row-key="id">
-					<el-table-column
-						v-for="column in tableColumnConfigs"
-						:key="column.key"
-						:prop="column.prop"
-						:label="column.label"
-						:min-width="column.minWidth"
-						:width="column.width"
-						:fixed="column.fixed"
-					>
-						<template #default="{ row }">
-							<span v-if="column.type === 'index'">{{ row.seq }}</span>
-							<el-button v-else-if="column.type === 'operation'" type="primary" link @click="handleRemove(row.id)">移除</el-button>
-							<span v-else>{{ row[column.prop] }}</span>
-						</template>
-					</el-table-column>
-				</el-table>
-
-				<div class="visitor-blacklist__pagination">
-					<Pagination
-						:current="formData.current"
-						:size="formData.size"
-						:total="pageState.total"
-						@sizeChange="handleSizeChange"
-						@currentChange="handleCurrentChange"
-					/>
-				</div>
-			</section>
+		<div class="layout-padding-auto layout-padding-view">
+			<ConfigurableTableWithForm
+				ref="tableRef"
+				:query-form-config="queryFormConfig"
+				:table-config="tableConfig"
+				:show-export="false"
+				@search="handleSearch"
+				@reset="handleReset"
+				@operation="handleOperation"
+				@size-change="handleSizeChange"
+				@current-change="handleCurrentChange"
+			>
+				<template #tableActions>
+					<el-button type="primary" @click="openCreateDialog">
+						<el-icon class="mr5">
+							<ele-Plus />
+						</el-icon>
+						新增
+					</el-button>
+				</template>
+			</ConfigurableTableWithForm>
 		</div>
 
 		<el-dialog
@@ -123,9 +72,9 @@
 </template>
 
 <script setup lang="ts" name="visitorBlacklist">
-import { computed, onMounted, reactive } from 'vue';
+import { computed, onMounted, reactive, ref } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
-import Pagination from '/@/components/Pagination/index.vue';
+import { ConfigurableTableWithForm, type TableConfig } from '@zhqc-smart/table';
 import { createVisitorBlacklist, getVisitorBlacklistPage, removeVisitorBlacklist, type VisitorBlacklistItem, type VisitorBlacklistType } from './api';
 import {
 	blacklistTypeConfigs,
@@ -133,20 +82,18 @@ import {
 	defaultFormData,
 	dialogFieldConfigs,
 	dialogTitle,
-	queryFieldConfigs,
-	tableColumnConfigs,
+	queryFormConfig,
+	tableColumns,
 	type BlacklistDialogField,
-	type BlacklistQueryField,
+	type BlacklistPageFormData,
 } from './index';
 import { buildBlacklistQueryParams, buildBlacklistTableRows, buildCreateBlacklistPayload } from './useBizProcess';
 
-const formData = reactive({
-	...defaultFormData,
-});
+const tableRef = ref();
 
-const dialogFormData = reactive({
-	...defaultDialogFormData,
-});
+const formData = reactive<BlacklistPageFormData>({ ...defaultFormData });
+
+const dialogFormData = reactive({ ...defaultDialogFormData });
 
 const pageState = reactive({
 	loading: false,
@@ -159,7 +106,20 @@ const dialogState = reactive({
 	submitting: false,
 });
 
-const tableRows = computed(() => buildBlacklistTableRows(pageState.records, formData.current, formData.size));
+const tableRows = computed(() => buildBlacklistTableRows(pageState.records));
+
+const tableConfig = computed<TableConfig>(() => ({
+	columns: tableColumns,
+	data: tableRows.value,
+	selectionType: 'none',
+	showIndex: true,
+	showOperations: true,
+	pagination: true,
+	pageSize: formData.size,
+	currentPage: formData.current,
+	total: pageState.total,
+	loading: pageState.loading,
+}));
 
 const currentTypeConfig = computed(() => {
 	return blacklistTypeConfigs.find((item) => item.value === dialogFormData.type) || blacklistTypeConfigs[0];
@@ -199,10 +159,6 @@ const visibleDialogFieldConfigs = computed(() => {
 		});
 });
 
-const handleQueryValueChange = (field: BlacklistQueryField, value: unknown) => {
-	formData[field] = typeof value === 'string' ? value : '';
-};
-
 const handleDialogFieldChange = (field: BlacklistDialogField, value: unknown) => {
 	dialogFormData[field] = typeof value === 'string' ? value : '';
 };
@@ -225,16 +181,16 @@ const loadTableData = async () => {
 	}
 };
 
-const handleSearch = () => {
+const handleSearch = (queryData: Record<string, unknown>) => {
+	formData.type = (queryData.type ?? '') as BlacklistPageFormData['type'];
+	formData.name = String(queryData.name ?? '');
+	formData.identityValue = String(queryData.identityValue ?? '');
 	formData.current = 1;
 	loadTableData();
 };
 
 const handleReset = () => {
-	Object.assign(formData, {
-		...defaultFormData,
-		size: formData.size,
-	});
+	Object.assign(formData, { ...defaultFormData, size: formData.size });
 	loadTableData();
 };
 
@@ -249,10 +205,12 @@ const handleCurrentChange = (current: number) => {
 	loadTableData();
 };
 
+const handleOperation = ({ action, row }: { action: string; row: VisitorBlacklistItem }) => {
+	if (action === 'remove') handleRemove(row.id);
+};
+
 const resetDialogForm = () => {
-	Object.assign(dialogFormData, {
-		...defaultDialogFormData,
-	});
+	Object.assign(dialogFormData, { ...defaultDialogFormData });
 };
 
 const openCreateDialog = () => {
@@ -282,7 +240,8 @@ const handleSubmitDialog = async () => {
 		await createVisitorBlacklist(buildCreateBlacklistPayload(dialogFormData, currentTypeConfig.value.description));
 		ElMessage.success('新增成功');
 		dialogState.visible = false;
-		handleSearch();
+		formData.current = 1;
+		loadTableData();
 	} finally {
 		dialogState.submitting = false;
 	}
@@ -320,67 +279,6 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .visitor-blacklist {
-	height: auto;
-
-	&__body {
-		padding: 20px;
-		display: flex;
-		flex-direction: column;
-		gap: 16px;
-		background: #f8fafc;
-		border-radius: 22px;
-		border: 1px solid #eef2f7;
-		overflow: auto;
-	}
-
-	&__search,
-	&__table-panel {
-		padding: 18px;
-		border-radius: 18px;
-		background: #fff;
-		border: 1px solid rgba(226, 232, 240, 0.9);
-		box-shadow: 0 12px 34px rgba(15, 23, 42, 0.04);
-	}
-
-	&__search-grid {
-		display: grid;
-		grid-template-columns: 160px 220px 220px auto auto;
-		gap: 12px;
-		align-items: end;
-	}
-
-	&__field-label,
-	&__dialog-label {
-		margin-bottom: 8px;
-		font-size: 13px;
-		font-weight: 500;
-		color: #475569;
-	}
-
-	&__actions {
-		display: flex;
-		align-items: center;
-		gap: 10px;
-	}
-
-	&__create-action {
-		display: flex;
-		justify-content: flex-end;
-	}
-
-	&__table {
-		:deep(th.el-table__cell) {
-			background: #f8fafc;
-			color: #64748b;
-			font-weight: 600;
-		}
-	}
-
-	&__pagination {
-		display: flex;
-		justify-content: flex-end;
-	}
-
 	&__dialog-title {
 		font-size: 20px;
 		font-weight: 700;
@@ -395,6 +293,13 @@ onMounted(() => {
 
 	&__dialog-block {
 		padding-bottom: 4px;
+	}
+
+	&__dialog-label {
+		margin-bottom: 8px;
+		font-size: 13px;
+		font-weight: 500;
+		color: #475569;
 	}
 
 	&__dialog-hint {
@@ -417,35 +322,6 @@ onMounted(() => {
 		display: flex;
 		justify-content: flex-end;
 		gap: 10px;
-	}
-}
-
-@media (max-width: 1440px) {
-	.visitor-blacklist {
-		&__search-grid {
-			grid-template-columns: repeat(3, minmax(0, 1fr));
-		}
-
-		&__actions,
-		&__create-action {
-			justify-content: flex-start;
-		}
-	}
-}
-
-@media (max-width: 768px) {
-	.visitor-blacklist {
-		&__body {
-			padding: 16px;
-		}
-
-		&__search-grid {
-			grid-template-columns: 1fr;
-		}
-
-		&__actions {
-			flex-wrap: wrap;
-		}
 	}
 }
 </style>

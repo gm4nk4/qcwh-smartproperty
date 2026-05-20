@@ -1,3 +1,4 @@
+import type { QueryFormConfig, TableColumn } from '@zhqc-smart/table';
 import type { VisitorBlacklistType } from './api';
 
 export interface BlacklistPageFormData {
@@ -23,15 +24,6 @@ export interface FieldOption {
 	value: string;
 }
 
-export interface QueryFieldConfig {
-	key: string;
-	field: BlacklistQueryField;
-	label: string;
-	component: 'el-input' | 'el-select';
-	props: Record<string, unknown>;
-	options?: FieldOption[];
-}
-
 export interface DialogFieldConfig {
 	key: string;
 	field: BlacklistDialogField;
@@ -48,16 +40,6 @@ export interface BlacklistTypeConfig {
 	identityLabel: string;
 	identityPlaceholder: string;
 	identifierRequired: boolean;
-}
-
-export interface BlacklistTableColumnConfig {
-	key: string;
-	prop: string;
-	label: string;
-	minWidth?: number;
-	width?: number;
-	type?: 'index' | 'operation';
-	fixed?: 'left' | 'right';
 }
 
 export const blacklistTypeConfigs: BlacklistTypeConfig[] = [
@@ -90,45 +72,38 @@ export const blacklistTypeConfigs: BlacklistTypeConfig[] = [
 	},
 ];
 
-export const blacklistTypeOptions: FieldOption[] = [
-	{ label: '全部', value: '' },
-	...blacklistTypeConfigs.map((item) => ({
-		label: item.label,
-		value: item.value,
-	})),
-];
+export const blacklistTypeOptions: FieldOption[] = blacklistTypeConfigs.map((item) => ({
+	label: item.label,
+	value: item.value,
+}));
 
-export const queryFieldConfigs: QueryFieldConfig[] = [
-	{
-		key: 'type',
-		field: 'type',
-		label: '名单类型',
-		component: 'el-select',
-		props: {
-			placeholder: '请选择',
-			clearable: true,
-		},
-		options: blacklistTypeOptions,
+export const queryFormConfig: QueryFormConfig = {
+	fields: [
+		{ label: '名单类型', value: 'type', type: 'select', selected: true },
+		{ label: '名单名称', value: 'name', type: 'text', selected: true },
+		{ label: '访客手机号/车牌号', value: 'identityValue', type: 'text', selected: true },
+	],
+	fieldOptions: {
+		type: blacklistTypeOptions,
 	},
+};
+
+export const tableColumns: TableColumn[] = [
+	{ prop: 'typeLabel', label: '名单类型', minWidth: 120, align: 'center' },
+	{ prop: 'name', label: '名单名称', minWidth: 140, align: 'center' },
+	{ prop: 'identityDisplay', label: '访客手机号/车牌号', minWidth: 160, align: 'center' },
+	{ prop: 'reasonDescription', label: '类型说明', minWidth: 220, align: 'center' },
+	{ prop: 'remark', label: '备注', minWidth: 180, align: 'center' },
+	{ prop: 'creator', label: '创建人', minWidth: 100, align: 'center' },
+	{ prop: 'createTime', label: '创建时间', minWidth: 160, align: 'center' },
 	{
-		key: 'name',
-		field: 'name',
-		label: '名单名称',
-		component: 'el-input',
-		props: {
-			placeholder: '请输入',
-			clearable: true,
-		},
-	},
-	{
-		key: 'identityValue',
-		field: 'identityValue',
-		label: '访客手机号/车牌号',
-		component: 'el-input',
-		props: {
-			placeholder: '请输入',
-			clearable: true,
-		},
+		prop: 'operation',
+		label: '操作',
+		type: 'operation',
+		width: 90,
+		fixed: 'right',
+		align: 'center',
+		operations: [{ label: '移除', action: 'remove', type: 'primary', link: true }],
 	},
 ];
 
@@ -166,18 +141,6 @@ export const dialogFieldConfigs: DialogFieldConfig[] = [
 			clearable: true,
 		},
 	},
-];
-
-export const tableColumnConfigs: BlacklistTableColumnConfig[] = [
-	{ key: 'seq', prop: 'seq', label: '序号', width: 70, type: 'index', fixed: 'left' },
-	{ key: 'typeLabel', prop: 'typeLabel', label: '名单类型', minWidth: 120 },
-	{ key: 'name', prop: 'name', label: '名单名称', minWidth: 140 },
-	{ key: 'identityDisplay', prop: 'identityDisplay', label: '访客手机号/车牌号', minWidth: 160 },
-	{ key: 'reasonDescription', prop: 'reasonDescription', label: '类型说明', minWidth: 220 },
-	{ key: 'remark', prop: 'remark', label: '备注', minWidth: 180 },
-	{ key: 'creator', prop: 'creator', label: '创建人', minWidth: 100 },
-	{ key: 'createTime', prop: 'createTime', label: '创建时间', minWidth: 160 },
-	{ key: 'operation', prop: 'operation', label: '操作', width: 90, type: 'operation', fixed: 'right' },
 ];
 
 export const defaultFormData: BlacklistPageFormData = {
