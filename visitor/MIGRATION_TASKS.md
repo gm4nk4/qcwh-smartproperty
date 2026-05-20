@@ -305,11 +305,12 @@
 
 ### C3. 角色管理
 
-- **状态**: ☐ pending
+- **状态**: ☑ done (PR #TBD, 2026-05-20)
 - **Owns**: `visitor/src/views/permission/role/**`
 - **依赖**: P0-5, C0
 - **内容**: 复制 access 对应目录的 `index.vue`、`components/`(含 `AppRoleTab.vue` 等)、`mock.ts`、`type.ts`
 - **历史**:
+  - 2026-05-20 PR #TBD 从 access/src/views/permission/role/ 复制 index.vue、mock.ts、type.ts、components/{AppRoleTab,AppTree,PermissionAssignDialog,PlatformRoleEditDialog,PlatformRoleTab,RoleAssignDialog,RoleEditDialog}.vue 到 visitor 同名路径,覆盖 P0-5 占位;保留 mock,不接后端;prettier --write 通过;npm run dev 下 /permission/role 正常加载
 
 ### C4. 岗位管理
 
