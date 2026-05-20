@@ -263,11 +263,12 @@
 
 ### B4. 访客配置
 
-- **状态**: ☐ pending
+- **状态**: ☑ done (PR #TBD, 2026-05-20)
 - **Owns**: `visitor/src/views/visitor/config/**`
 - **依赖**: P0-1, P0-2, P0-3
 - **内容**: 设备表格改为 `ConfigurableTable`(无查询面板)
 - **历史**:
+  - 2026-05-20 PR #TBD 设备表格接入 `@zhqc-smart/table` 的 `ConfigurableTable`,不引入查询面板
 
 ### B5. 访客总览
 
