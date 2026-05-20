@@ -1,3 +1,4 @@
+import type { QueryFormConfig, TableColumn } from '@zhqc-smart/table';
 import type { VisitorAppointmentStatus } from './api';
 
 export interface AppointmentFormData {
@@ -13,30 +14,6 @@ export interface AppointmentFormData {
 
 export type AppointmentQueryField = keyof Omit<AppointmentFormData, 'current' | 'size'>;
 export type AppointmentTextField = Exclude<AppointmentQueryField, 'status'>;
-
-export interface QueryFieldOption {
-	label: string;
-	value: string;
-}
-
-export interface QueryFieldConfig {
-	key: string;
-	field: AppointmentQueryField;
-	label: string;
-	component: 'el-input' | 'el-select';
-	props: Record<string, unknown>;
-	options?: QueryFieldOption[];
-}
-
-export interface AppointmentTableColumnConfig {
-	key: string;
-	prop: string;
-	label: string;
-	minWidth?: number;
-	width?: number;
-	type?: 'index' | 'status' | 'operation';
-	fixed?: 'left' | 'right';
-}
 
 export interface DetailFieldConfig {
 	label: string;
@@ -59,93 +36,49 @@ export interface PassRecordColumnConfig {
 	type?: 'preview';
 }
 
-export const visitStatusOptions: QueryFieldOption[] = [
-	{ label: '全部', value: '' },
+export const visitStatusOptions = [
 	{ label: '待来访', value: 'pending_visit' },
 	{ label: '已完成', value: 'completed' },
 	{ label: '已失效', value: 'expired' },
 ];
 
-export const queryFieldConfigs: QueryFieldConfig[] = [
-	{
-		key: 'visitorName',
-		field: 'visitorName',
-		label: '访客姓名',
-		component: 'el-input',
-		props: {
-			placeholder: '请输入',
-			clearable: true,
-		},
+export const queryFormConfig: QueryFormConfig = {
+	fields: [
+		{ label: '访客姓名', value: 'visitorName', type: 'text', selected: true },
+		{ label: '访客手机号', value: 'visitorPhone', type: 'text', selected: true },
+		{ label: '访客车牌号', value: 'visitorVehicleNo', type: 'text', selected: true },
+		{ label: '被访人企业', value: 'visitedEnterprise', type: 'text', selected: true },
+		{ label: '被访人姓名', value: 'visitedName', type: 'text', selected: true },
+		{ label: '访问状态', value: 'status', type: 'select', selected: true },
+	],
+	fieldOptions: {
+		status: visitStatusOptions,
 	},
-	{
-		key: 'visitorPhone',
-		field: 'visitorPhone',
-		label: '访客手机号',
-		component: 'el-input',
-		props: {
-			placeholder: '请输入',
-			clearable: true,
-		},
-	},
-	{
-		key: 'visitorVehicleNo',
-		field: 'visitorVehicleNo',
-		label: '访客车牌号',
-		component: 'el-input',
-		props: {
-			placeholder: '请输入',
-			clearable: true,
-		},
-	},
-	{
-		key: 'visitedEnterprise',
-		field: 'visitedEnterprise',
-		label: '被访人企业',
-		component: 'el-input',
-		props: {
-			placeholder: '请输入',
-			clearable: true,
-		},
-	},
-	{
-		key: 'visitedName',
-		field: 'visitedName',
-		label: '被访人姓名',
-		component: 'el-input',
-		props: {
-			placeholder: '请输入',
-			clearable: true,
-		},
-	},
-	{
-		key: 'status',
-		field: 'status',
-		label: '访问状态',
-		component: 'el-select',
-		props: {
-			placeholder: '请选择',
-			clearable: true,
-		},
-		options: visitStatusOptions,
-	},
-];
+};
 
-export const tableColumnConfigs: AppointmentTableColumnConfig[] = [
-	{ key: 'seq', prop: 'seq', label: '序号', width: 70, type: 'index', fixed: 'left' },
-	{ key: 'appointmentNo', prop: 'appointmentNo', label: '访客单号', minWidth: 110 },
-	{ key: 'visitorName', prop: 'visitorName', label: '访客姓名', minWidth: 110 },
-	{ key: 'visitorPhone', prop: 'visitorPhone', label: '访客手机号', minWidth: 130 },
-	{ key: 'visitReason', prop: 'visitReason', label: '来访事由', minWidth: 110 },
-	{ key: 'visitorCount', prop: 'visitorCount', label: '访客人数', minWidth: 90 },
-	{ key: 'appointmentTime', prop: 'appointmentTime', label: '来访时间', minWidth: 160 },
-	{ key: 'visitorVehicleNo', prop: 'visitorVehicleNo', label: '访客车牌号', minWidth: 120 },
-	{ key: 'gateNames', prop: 'gateNames', label: '访客通行门禁', minWidth: 220 },
-	{ key: 'visitedName', prop: 'visitedName', label: '被访人姓名', minWidth: 110 },
-	{ key: 'visitedEnterprise', prop: 'visitedEnterprise', label: '被访人企业', minWidth: 130 },
-	{ key: 'visitedPhone', prop: 'visitedPhone', label: '被访人手机号', minWidth: 130 },
-	{ key: 'launchTime', prop: 'launchTime', label: '发起时间', minWidth: 160 },
-	{ key: 'status', prop: 'status', label: '访问状态', minWidth: 110, type: 'status' },
-	{ key: 'operation', prop: 'operation', label: '操作', width: 90, type: 'operation', fixed: 'right' },
+export const tableColumns: TableColumn[] = [
+	{ prop: 'appointmentNo', label: '访客单号', minWidth: 110, align: 'center' },
+	{ prop: 'visitorName', label: '访客姓名', minWidth: 110, align: 'center' },
+	{ prop: 'visitorPhone', label: '访客手机号', minWidth: 130, align: 'center' },
+	{ prop: 'visitReason', label: '来访事由', minWidth: 110, align: 'center' },
+	{ prop: 'visitorCount', label: '访客人数', minWidth: 90, align: 'center' },
+	{ prop: 'appointmentTime', label: '来访时间', minWidth: 160, align: 'center' },
+	{ prop: 'visitorVehicleNo', label: '访客车牌号', minWidth: 120, align: 'center' },
+	{ prop: 'gateNames', label: '访客通行门禁', minWidth: 220, align: 'center' },
+	{ prop: 'visitedName', label: '被访人姓名', minWidth: 110, align: 'center' },
+	{ prop: 'visitedEnterprise', label: '被访人企业', minWidth: 130, align: 'center' },
+	{ prop: 'visitedPhone', label: '被访人手机号', minWidth: 130, align: 'center' },
+	{ prop: 'launchTime', label: '发起时间', minWidth: 160, align: 'center' },
+	{ prop: 'status', label: '访问状态', minWidth: 110, align: 'center', slot: 'statusSlot' },
+	{
+		prop: 'operation',
+		label: '操作',
+		type: 'operation',
+		width: 90,
+		fixed: 'right',
+		align: 'center',
+		operations: [{ label: '详情', action: 'detail', type: 'primary', link: true }],
+	},
 ];
 
 export const detailSectionConfigs: DetailSectionConfig[] = [

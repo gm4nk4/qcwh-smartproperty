@@ -1,15 +1,9 @@
-import type { VisitorAppointmentDetail, VisitorAppointmentItem, VisitorAppointmentPageParams, VisitorAppointmentPassRecord, VisitorAppointmentStatus } from './api';
+import type { VisitorAppointmentDetail, VisitorAppointmentPageParams, VisitorAppointmentPassRecord, VisitorAppointmentStatus } from './api';
 import type { AppointmentFormData, DetailSectionConfig } from './index';
 
 export interface StatusTagMeta {
 	label: string;
 	className: string;
-}
-
-export interface AppointmentTableRow extends VisitorAppointmentItem {
-	seq: number;
-	statusText: string;
-	statusClassName: string;
 }
 
 export interface AppointmentDetailSectionItem {
@@ -74,18 +68,6 @@ export const buildAppointmentQueryParams = (formData: AppointmentFormData): Visi
 
 export const getAppointmentStatusMeta = (status: VisitorAppointmentStatus): StatusTagMeta => {
 	return statusMetaMap[status];
-};
-
-export const buildAppointmentTableRows = (records: VisitorAppointmentItem[], current: number, size: number): AppointmentTableRow[] => {
-	return records.map((item, index) => {
-		const statusMeta = getAppointmentStatusMeta(item.status);
-		return {
-			...item,
-			seq: (current - 1) * size + index + 1,
-			statusText: statusMeta.label,
-			statusClassName: statusMeta.className,
-		};
-	});
 };
 
 export const buildAppointmentDetailSections = (

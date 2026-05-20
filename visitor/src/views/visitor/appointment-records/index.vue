@@ -1,69 +1,23 @@
 <template>
 	<div class="layout-padding visitor-appointment">
-		<div class="layout-padding-auto layout-padding-view visitor-appointment__body">
-			<section class="visitor-appointment__search">
-				<div class="visitor-appointment__search-grid">
-					<div class="visitor-appointment__field" v-for="item in queryFieldConfigs" :key="item.key">
-						<div class="visitor-appointment__field-label">{{ item.label }}</div>
-						<component
-							:is="item.component"
-							v-bind="item.props"
-							:model-value="formData[item.field]"
-							@update:modelValue="(value: unknown) => handleFormValueChange(item.field, value)"
-						>
-							<template v-if="item.component === 'el-select'">
-								<el-option v-for="option in item.options" :key="option.value" :label="option.label" :value="option.value" />
-							</template>
-						</component>
-					</div>
-
-					<div class="visitor-appointment__actions">
-						<el-button type="primary" @click="handleSearch">
-							<el-icon class="mr5">
-								<ele-Search />
-							</el-icon>
-							查询
-						</el-button>
-						<el-button @click="handleReset">
-							<el-icon class="mr5">
-								<ele-Refresh />
-							</el-icon>
-							重置
-						</el-button>
-					</div>
-				</div>
-			</section>
-
-			<section class="visitor-appointment__table-panel" v-loading="pageState.loading">
-				<el-table :data="tableRows" class="visitor-appointment__table" row-key="id">
-					<el-table-column
-						v-for="column in tableColumnConfigs"
-						:key="column.key"
-						:prop="column.prop"
-						:label="column.label"
-						:min-width="column.minWidth"
-						:width="column.width"
-						:fixed="column.fixed"
-					>
-						<template #default="{ row }">
-							<span v-if="column.type === 'index'">{{ row.seq }}</span>
-							<span v-else-if="column.type === 'status'" :class="row.statusClassName">{{ row.statusText }}</span>
-							<el-button v-else-if="column.type === 'operation'" type="primary" link @click="openDetailDialog(row.id)">详情</el-button>
-							<span v-else>{{ row[column.prop] }}</span>
-						</template>
-					</el-table-column>
-				</el-table>
-
-				<div class="visitor-appointment__pagination">
-					<Pagination
-						:current="formData.current"
-						:size="formData.size"
-						:total="pageState.total"
-						@sizeChange="handleSizeChange"
-						@currentChange="handleCurrentChange"
-					/>
-				</div>
-			</section>
+		<div class="layout-padding-auto layout-padding-view">
+			<ConfigurableTableWithForm
+				ref="tableRef"
+				:query-form-config="queryFormConfig"
+				:table-config="tableConfig"
+				:show-export="false"
+				@search="handleSearch"
+				@reset="handleReset"
+				@operation="handleOperation"
+				@size-change="handleSizeChange"
+				@current-change="handleCurrentChange"
+			>
+				<template #statusSlot="{ row }">
+					<span :class="getAppointmentStatusMeta(row.status).className">
+						{{ getAppointmentStatusMeta(row.status).label }}
+					</span>
+				</template>
+			</ConfigurableTableWithForm>
 		</div>
 
 		<el-dialog
@@ -77,11 +31,7 @@
 			<template #header>
 				<div class="visitor-appointment__dialog-header">
 					<span class="visitor-appointment__dialog-title">{{ detailDialogTitle }}</span>
-					<span
-						v-if="currentDetail"
-						:class="currentStatusMeta.className"
-						class="visitor-appointment__dialog-status"
-					>
+					<span v-if="currentDetail" :class="currentStatusMeta.className" class="visitor-appointment__dialog-status">
 						{{ currentStatusMeta.label }}
 					</span>
 				</div>
@@ -150,35 +100,27 @@
 
 <script setup lang="ts" name="visitorAppointmentRecords">
 import { computed, onMounted, reactive, ref } from 'vue';
-import Pagination from '/@/components/Pagination/index.vue';
-import {
-	getVisitorAppointmentDetail,
-	getVisitorAppointmentPage,
-	type VisitorAppointmentDetail,
-	type VisitorAppointmentItem,
-} from './api';
+import { ConfigurableTableWithForm, type TableConfig } from '@zhqc-smart/table';
+import { getVisitorAppointmentDetail, getVisitorAppointmentPage, type VisitorAppointmentDetail, type VisitorAppointmentItem } from './api';
 import {
 	type AppointmentFormData,
-	type AppointmentQueryField,
-	type AppointmentTextField,
 	defaultFormData,
 	detailDialogTitle,
 	detailSectionConfigs,
 	passRecordColumnConfigs,
-	queryFieldConfigs,
-	tableColumnConfigs,
+	queryFormConfig,
+	tableColumns,
 } from './index';
 import {
 	buildAppointmentDetailSections,
 	buildAppointmentPassRecordRows,
 	buildAppointmentQueryParams,
-	buildAppointmentTableRows,
 	getAppointmentStatusMeta,
 } from './useBizProcess';
 
-const formData = reactive<AppointmentFormData>({
-	...defaultFormData,
-});
+const tableRef = ref();
+
+const queryParams = reactive<AppointmentFormData>({ ...defaultFormData });
 
 const pageState = reactive({
 	loading: false,
@@ -192,16 +134,24 @@ const dialogState = reactive({
 	currentDetail: null as VisitorAppointmentDetail | null,
 });
 
-const tableRows = computed(() => buildAppointmentTableRows(pageState.records, formData.current, formData.size));
+const tableConfig = computed<TableConfig>(() => ({
+	columns: tableColumns,
+	data: pageState.records,
+	selectionType: 'none',
+	showIndex: true,
+	showOperations: true,
+	pagination: true,
+	pageSize: queryParams.size,
+	currentPage: queryParams.current,
+	total: pageState.total,
+	loading: pageState.loading,
+}));
 
 const currentDetail = computed(() => dialogState.currentDetail);
 
 const currentStatusMeta = computed(() => {
 	if (!dialogState.currentDetail) {
-		return {
-			label: '',
-			className: '',
-		};
+		return { label: '', className: '' };
 	}
 	return getAppointmentStatusMeta(dialogState.currentDetail.status);
 });
@@ -212,23 +162,10 @@ const passRecordRows = computed(() => {
 	return dialogState.currentDetail ? buildAppointmentPassRecordRows(dialogState.currentDetail.passRecords) : [];
 });
 
-const isAppointmentTextField = (field: AppointmentQueryField): field is AppointmentTextField => {
-	return field !== 'status';
-};
-
-const handleFormValueChange = (field: AppointmentQueryField, value: unknown) => {
-	if (isAppointmentTextField(field)) {
-		formData[field] = typeof value === 'string' ? value : '';
-		return;
-	}
-
-	formData.status = (value ?? '') as AppointmentFormData['status'];
-};
-
 const loadTableData = async () => {
 	pageState.loading = true;
 	try {
-		const res = await getVisitorAppointmentPage(buildAppointmentQueryParams(formData));
+		const res = await getVisitorAppointmentPage(buildAppointmentQueryParams(queryParams));
 		pageState.records = res.data.records;
 		pageState.total = res.data.total;
 	} finally {
@@ -236,28 +173,35 @@ const loadTableData = async () => {
 	}
 };
 
-const handleSearch = () => {
-	formData.current = 1;
+const handleSearch = (formData: Record<string, unknown>) => {
+	queryParams.visitorName = String(formData.visitorName ?? '');
+	queryParams.visitorPhone = String(formData.visitorPhone ?? '');
+	queryParams.visitorVehicleNo = String(formData.visitorVehicleNo ?? '');
+	queryParams.visitedEnterprise = String(formData.visitedEnterprise ?? '');
+	queryParams.visitedName = String(formData.visitedName ?? '');
+	queryParams.status = (formData.status ?? '') as AppointmentFormData['status'];
+	queryParams.current = 1;
 	loadTableData();
 };
 
 const handleReset = () => {
-	Object.assign(formData, {
-		...defaultFormData,
-		size: formData.size,
-	});
+	Object.assign(queryParams, { ...defaultFormData, size: queryParams.size });
 	loadTableData();
 };
 
 const handleSizeChange = (size: number) => {
-	formData.size = size;
-	formData.current = 1;
+	queryParams.size = size;
+	queryParams.current = 1;
 	loadTableData();
 };
 
 const handleCurrentChange = (current: number) => {
-	formData.current = current;
+	queryParams.current = current;
 	loadTableData();
+};
+
+const handleOperation = ({ action, row }: { action: string; row: VisitorAppointmentItem }) => {
+	if (action === 'detail') openDetailDialog(row.id);
 };
 
 const openDetailDialog = async (id: string) => {
@@ -283,65 +227,6 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .visitor-appointment {
-	height: auto;
-
-	&__body {
-		padding: 20px;
-		display: flex;
-		flex-direction: column;
-		gap: 16px;
-		background:
-			radial-gradient(circle at top left, rgba(59, 130, 246, 0.05), transparent 26%),
-			radial-gradient(circle at top right, rgba(14, 165, 233, 0.05), transparent 24%),
-			#f8fafc;
-		border-radius: 22px;
-		border: 1px solid #eef2f7;
-		overflow: auto;
-	}
-
-	&__search,
-	&__table-panel {
-		padding: 18px;
-		border-radius: 20px;
-		background: rgba(255, 255, 255, 0.95);
-		border: 1px solid rgba(226, 232, 240, 0.9);
-		box-shadow: 0 12px 34px rgba(15, 23, 42, 0.04);
-	}
-
-	&__search-grid {
-		display: grid;
-		grid-template-columns: repeat(6, minmax(0, 1fr)) auto;
-		gap: 12px;
-		align-items: end;
-	}
-
-	&__field-label {
-		margin-bottom: 6px;
-		font-size: 13px;
-		color: #64748b;
-		font-weight: 500;
-	}
-
-	&__actions {
-		display: flex;
-		align-items: center;
-		gap: 10px;
-		padding-top: 22px;
-	}
-
-	&__table {
-		:deep(th.el-table__cell) {
-			background: #f8fafc;
-			color: #64748b;
-			font-weight: 600;
-		}
-	}
-
-	&__pagination {
-		display: flex;
-		justify-content: flex-end;
-	}
-
 	&__dialog-header {
 		display: flex;
 		align-items: center;
@@ -432,46 +317,14 @@ onMounted(() => {
 	}
 }
 
-@media (max-width: 1440px) {
-	.visitor-appointment {
-		&__search-grid {
-			grid-template-columns: repeat(4, minmax(0, 1fr));
-		}
-
-		&__actions {
-			padding-top: 0;
-		}
-	}
-}
-
 @media (max-width: 992px) {
 	.visitor-appointment {
-		&__body {
-			padding: 16px;
-		}
-
-		&__search-grid {
-			grid-template-columns: repeat(2, minmax(0, 1fr));
-		}
-
 		&__detail-grid {
 			grid-template-columns: 1fr;
 		}
 
 		&__detail-item--full {
 			grid-column: span 1;
-		}
-	}
-}
-
-@media (max-width: 640px) {
-	.visitor-appointment {
-		&__search-grid {
-			grid-template-columns: 1fr;
-		}
-
-		&__actions {
-			flex-wrap: wrap;
 		}
 	}
 }
