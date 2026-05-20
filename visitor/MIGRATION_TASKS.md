@@ -493,6 +493,30 @@
 - **历史**:
   - 2026-05-20 PR #TBD `visitor/src/router/route.ts` 4 项设置路由 + `set` 父级分组 + 隐藏 personal 路由统一补齐 `/visitor/` 前缀，修复 qiankun 主应用下点击「设置」子项跳 404
 
+## P2-8. 修复「设置」分组子菜单选中态蓝色 marker 条贴文字左侧
+
+- **状态**: 🟡 in-progress (P2-8, devin/<unix>-P2-8-visitor-settings-submenu-marker)
+- **Owns**:
+  - `visitor/src/router/route.ts`（4 项设置 leaf 路由补 `level: 2`，并去掉显式 `: RouteRecordRaw` 标注以兼容 layout 约定字段）
+  - `visitor/MIGRATION_TASKS.md`（仅本任务章节）
+- **依赖**: P2-7（4 项设置路由已补齐 `/visitor/` 前缀、可在 qiankun 下正常打开）
+- **背景**: P2-7 修好 404 后，用户反馈点击「设置」分组的 4 个子项，选中态那条蓝色 marker 条紧贴文字左侧，而 access 子应用同样的子菜单 marker 是推到菜单最左缘的。
+- **根因**: 公共 `@zhqc-smart/layout` 的 <ref_snippet file="components/packages/layout/src/navMenu/subItem.vue" lines="18-29" /> 渲染 sub-item 时用 `val.level` 计算 `marginLeft = val.level * 18 + 'px'` 与 CSS 变量 `--before-left = -(val.level * 18) + 'px'`；后者驱动 <ref_snippet file="components/packages/layout/src/navMenu/vertical.vue" lines="359-396" /> 中 `.layout-nav-menu__child.is-active::before` 的 `left` —— 这就是那条蓝色 marker。
+
+  access 的 `mockRoute.ts` 每条 leaf 子菜单都写了 `level: 2`（13 处），把缩进定到 36px、marker 推到菜单左缘。
+
+  visitor 在 P2-5 引入「设置」父级分组时，4 条 leaf 路由没带 `level` 字段：`undefined * 18 = NaN`，`marginLeft: 'NaNpx !important'` 与 `--before-left: 'NaNpx'` 都是非法 CSS 被浏览器丢弃，marker 条退回默认位置（0），就紧贴文字左侧。
+- **修复**: 仅业务路由配置改动，不动公共 layout / vue-router 基础设施：
+  - `userRoute`、`roleRoute`、`organizationRoute`、`menuRoute` 4 条 leaf 路由各加 `level: 2`，与 access mockRoute 对齐
+  - 同时去掉这 4 条 leaf 路由的 `: RouteRecordRaw` 显式标注：`level` 不是 vue-router `RouteRecordRaw` 原生字段（是公共 layout 约定的菜单渲染字段），带显式标注会触发 TS 多余属性检查；改为依赖 `settingsRoutes: Array<RouteRecordRaw>` 的数组类型做结构兼容检查（非 fresh literal，不触发 excess property check），`level` 在运行时依然挂在对象上供 `subItem.vue` 读取
+  - 访客 6 条顶级路由由 `vertical.vue` 的顶层 `el-menu-item` 渲染，**不走 subItem.vue**，不需要 `level`；`set` 父级分组渲染为 `el-sub-menu`、隐藏的 `personalRoute` 不进菜单，也都不需要 `level`
+- **校验**（本机由用户跑，VM 不跑 build / install）:
+  - 在 main-app（qiankun 主应用）下进入 visitor「设置」，4 个子项的选中态蓝色 marker 条与 access 视觉一致（推到菜单左缘）、文字缩进 36px
+  - 访客其余 6 项顶级菜单的选中态、icon、缩进表现不变
+  - `npm run lint:eslint` 0 error（沿用 P2-3 基线）
+- **历史**:
+  - 2026-05-20 PR #TBD `visitor/src/router/route.ts` 4 条 settings leaf 路由补 `level: 2`，对齐 access mockRoute 的 sub-item 渲染约定，修复「设置」分组选中态 marker 条贴文字左侧的样式问题
+
 ## P2-3. 最终 lint + build
 
 - **状态**: ☑ done (PR #TBD, 2026-05-20)
