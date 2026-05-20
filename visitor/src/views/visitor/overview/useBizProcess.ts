@@ -48,12 +48,26 @@ export const filterTrendRecordsByRange = (records: VisitorTrendRecord[], dateRan
 
 export const buildTrendChartOption = (records: VisitorTrendRecord[], enterprises: VisitorEnterpriseItem[], metric: TrendMetricKey) => {
 	const unit = metricUnitMap[metric];
+
+	// 预计算二维数据矩阵 [series][xIndex]，并按 x 找出"最顶上一个非零段"的 series 下标，
+	// 后续 itemStyle.borderRadius 只在该段顶部生效，避免每段都顶部圆角导致的"胶囊堆叠"丑感。
+	const dataMatrix = enterprises.map((enterprise) => records.map((r) => getMetricValue(r.metrics[enterprise.code], metric)));
+	const topSeriesPerX = records.map((_, xIndex) => {
+		for (let s = enterprises.length - 1; s >= 0; s--) {
+			if (dataMatrix[s][xIndex] > 0) return s;
+		}
+		return -1;
+	});
+
 	return {
 		color: enterprises.map((item) => item.color),
 		tooltip: {
 			trigger: 'axis',
 			axisPointer: {
 				type: 'shadow',
+				shadowStyle: {
+					color: 'rgba(99, 102, 241, 0.06)',
+				},
 			},
 			backgroundColor: 'rgba(15, 23, 42, 0.92)',
 			borderWidth: 0,
@@ -75,6 +89,7 @@ export const buildTrendChartOption = (records: VisitorTrendRecord[], enterprises
 			icon: 'roundRect',
 			itemWidth: 10,
 			itemHeight: 10,
+			itemGap: 18,
 			textStyle: {
 				color: '#64748b',
 				fontSize: 12,
@@ -124,18 +139,33 @@ export const buildTrendChartOption = (records: VisitorTrendRecord[], enterprises
 				color: '#94a3b8',
 			},
 		},
-		series: enterprises.map((enterprise) => ({
+		series: enterprises.map((enterprise, sIndex) => ({
 			name: enterprise.name,
 			type: 'bar',
 			stack: metric,
-			barWidth: 26,
-			itemStyle: {
-				borderRadius: [6, 6, 0, 0],
-			},
+			barWidth: 20,
 			emphasis: {
 				focus: 'series',
+				itemStyle: {
+					shadowBlur: 14,
+					shadowOffsetY: 4,
+					shadowColor: 'rgba(15, 23, 42, 0.18)',
+				},
 			},
-			data: records.map((record) => getMetricValue(record.metrics[enterprise.code], metric)),
+			data: records.map((_, xIndex) => {
+				const value = dataMatrix[sIndex][xIndex];
+				const isTop = topSeriesPerX[xIndex] === sIndex;
+				// 仅最顶段顶部圆角，其余段保持矩形拼接；段与段之间用 1px 同背景色 borderColor 形成细缝，
+				// 避免相邻同色段挤在一起糊成一片。
+				return {
+					value,
+					itemStyle: {
+						borderRadius: isTop ? [8, 8, 0, 0] : [0, 0, 0, 0],
+						borderColor: '#ffffff',
+						borderWidth: value > 0 ? 1 : 0,
+					},
+				};
+			}),
 		})),
 	};
 };
