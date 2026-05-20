@@ -3,7 +3,7 @@ import pinia from '/@/stores/index';
 import { useUserInfo } from '/@/stores/userInfo';
 import { Session } from '/@/utils/storage';
 import { NextLoading } from '/@/utils/loading';
-import { baseRoutes, notFoundAndNoPower, dynamicRoutes } from '/@/router/route';
+import { baseRoutes, notFoundAndNoPower, dynamicRoutes, menuRoutes } from '/@/router/route';
 import { formatTwoStageRoutes, formatFlatteningRoutes, router } from '/@/router/index';
 import { useRoutesList } from '/@/stores/routesList';
 import { useTagsViewRoutes } from '/@/stores/tagsViewRoutes';
@@ -39,10 +39,13 @@ export async function initBackEndControlRoutes() {
  * 设置路由到 pinia routesList 中（已处理成多级嵌套路由）及缓存多级嵌套数组处理后的一维数组
  * @description 用于左侧菜单、横向菜单的显示
  * @description 用于 tagsView、菜单搜索中：未过滤隐藏的(isHide)
+ *
+ * 注：左侧菜单使用 `menuRoutes`（含「设置」父级分组），
+ * vue-router 实际注册仍走 `dynamicRoutes`（保持扁平，避免嵌套重复注册）。
  */
 export async function setFilterMenuAndCacheTagsViewRoutes() {
 	const storesRoutesList = useRoutesList(pinia);
-	storesRoutesList.setRoutesList(baseRoutes[0].children as any);
+	storesRoutesList.setRoutesList(menuRoutes as any);
 	setCacheTagsViewRoutes();
 }
 

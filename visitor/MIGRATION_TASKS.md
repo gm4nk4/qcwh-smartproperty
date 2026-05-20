@@ -121,7 +121,7 @@
 
 ## P0-5. 一次性占位路由(关键防冲突任务)
 
-- **状态**: ☑ done (PR #TBD, 2026-05-19)
+- **状态**: ☑ done (PR #TBD, 2026-05-19),🚫 部分作废 (P2-5, 2026-05-20)
 - **Owns**:
   - `visitor/src/router/route.ts`(改:加完下面 9 条 permission/portal 路由,component 全部指向 `views/_placeholder/index.vue`)
   - `visitor/src/views/_placeholder/index.vue`(新增:一个简单的 "Coming soon" 占位组件)
@@ -143,6 +143,7 @@
 
 - **历史**:
   - 2026-05-19 PR #TBD 新增 `views/_placeholder/index.vue` 通用 "Coming soon" 占位组件 + 9 个模块 `views/{permission,portal}/<name>/index.vue` 占位 re-export 文件,并在 `router/route.ts` 的 `dynamicRoutes` 中一次性追加 9 条 permission/* + portal/* 路由(每条 `component` 指向自身模块下的 `index.vue`)。`npm run dev` 启动 OK(HTTP 200),路由可加载;`npm run build` 仍受 P0-8 的 `screenfull/vue-router` resolve bug 影响,与本任务无关。
+  - 2026-05-20 P2-5(本期菜单收口)删除 `/permission/{position,space}`、`/portal/{application,ai,category,workbench}` 共 6 条占位路由及对应 `views/` 目录,理由见 P2-5。
 
 ## P0-6. 清理 visitor 自研 layout
 
@@ -312,21 +313,19 @@
 - **历史**:
   - 2026-05-20 PR #TBD 从 access/src/views/permission/role/ 复制 index.vue、mock.ts、type.ts、components/{AppRoleTab,AppTree,PermissionAssignDialog,PlatformRoleEditDialog,PlatformRoleTab,RoleAssignDialog,RoleEditDialog}.vue 到 visitor 同名路径,覆盖 P0-5 占位;保留 mock,不接后端;prettier --write 通过;npm run dev 下 /permission/role 正常加载
 
-### C4. 岗位管理
+### C4. 岗位管理 — 已剔除(需求整理错误)
 
-- **状态**: 🚫 cancelled (2026-05-20, 需求未整理)
-- **Owns**: `visitor/src/views/permission/position/**`
-- **依赖**: P0-5, C0
-- **历史**:
-  - 2026-05-20 用户决议：本期不迁移。P0-5 占位路由与占位 index.vue 保留(以免反复增删路由表)，后续需求明确后可重启本任务
-
-### C5. 空间管理
-
-- **状态**: 🚫 cancelled (2026-05-20, 需求未整理)
-- **Owns**: `visitor/src/views/permission/space/**`
-- **依赖**: P0-5, C0
+- **状态**: 🚫 removed (P2-5, 2026-05-20)
 - **历史**:
   - 2026-05-20 用户决议：本期不迁移。P0-5 占位路由与占位 index.vue 保留
+  - 2026-05-20 P2-5 决议：岗位管理不属于 visitor 业务范围，P2-5 PR #TBD 一次性删除 `/permission/position` 路由与 `visitor/src/views/permission/position/` 目录
+
+### C5. 空间管理 — 已剔除(需求整理错误)
+
+- **状态**: 🚫 removed (P2-5, 2026-05-20)
+- **历史**:
+  - 2026-05-20 用户决议：本期不迁移。P0-5 占位路由与占位 index.vue 保留
+  - 2026-05-20 P2-5 决议：空间管理不属于 visitor 业务范围，P2-5 PR #TBD 一次性删除 `/permission/space` 路由与 `visitor/src/views/permission/space/` 目录
 
 ### C6. 组织管理
 
@@ -337,38 +336,12 @@
 - **历史**:
   - 2026-05-20 PR #TBD 从 access 复制 permission/organization 全套(index.vue / mock.ts / type.ts / components/{UnifiedOrgView,IndependentOrgView,OrgTree,OrgEditDialog}.vue),覆盖 P0-5 占位,prettier 格式化
 
-### C7. 统一门户 — 子应用管理
+### C7~C10. 统一门户系列(子应用管理 / AI 工具中心 / 应用分类 / 工作台配置)— 已剔除(需求整理错误)
 
-- **状态**: 🚫 cancelled (2026-05-20, 需求未整理)
-- **Owns**: `visitor/src/views/portal/application/**`
-- **依赖**: P0-5, C0
+- **状态**: 🚫 removed (P2-5, 2026-05-20)
 - **历史**:
   - 2026-05-20 用户决议：本期不迁移。P0-5 占位路由与占位 index.vue 保留
-
-### C8. 统一门户 — AI 工具中心
-
-- **状态**: 🚫 cancelled (2026-05-20, 需求未整理)
-- **Owns**: `visitor/src/views/portal/ai/**`
-- **依赖**: P0-5, C0
-- **内容**: 包含 `components/ModelsManage.vue` 等
-- **历史**:
-  - 2026-05-20 用户决议：本期不迁移。P0-5 占位路由与占位 index.vue 保留
-
-### C9. 统一门户 — 应用分类
-
-- **状态**: 🚫 cancelled (2026-05-20, 需求未整理)
-- **Owns**: `visitor/src/views/portal/category/**`
-- **依赖**: P0-5, C0
-- **历史**:
-  - 2026-05-20 用户决议：本期不迁移。P0-5 占位路由与占位 index.vue 保留
-
-### C10. 统一门户 — 工作台配置
-
-- **状态**: 🚫 cancelled (2026-05-20, 需求未整理)
-- **Owns**: `visitor/src/views/portal/workbench/**`
-- **依赖**: P0-5, C0
-- **历史**:
-  - 2026-05-20 用户决议：本期不迁移。P0-5 占位路由与占位 index.vue 保留
+  - 2026-05-20 P2-5 决议：统一门户子应用管理 / AI 工具中心 / 应用分类 / 工作台配置 4 项均不属于 visitor 业务范围，P2-5 PR #TBD 一次性删除 `/portal/{application,ai,category,workbench}` 4 条路由与 `visitor/src/views/portal/` 整个目录
 
 ### C11. 系统设置 — 菜单管理
 
@@ -400,14 +373,12 @@
 - **历史**:
   - 2026-05-20 PR #13 从 `access/src/views/admin/user/` 复制 `UserAuthDialog.vue`、`userDetail.vue`、`mock.ts`、`type.ts`、`components/{PermissionPanel.vue,UserInfoPanel.vue}` 到 `visitor/src/views/admin/user/` 同名路径,内容与 access 完全一致(diff 无差异)。所有 import 均为相对路径(`./mock`、`./type`、`./components/*`)或第三方包(`vue`、`element-plus`、`@element-plus/icons-vue`),无 `/@/` 别名依赖,visitor 已有相同版本的 element-plus 2.13.1 + @element-plus/icons-vue 2.3.2,无需补充依赖。未改 `index.vue`/`form.vue`/`personal.vue`/`i18n/`(本任务范围仅同步上述新增文件)。本地 `npx prettier --write src/views/admin/user/` 通过;`npm run dev` HTTP 200。
 
-### D4. 主题图片库
+### D4. 主题图片库 — 已剔除(需求整理错误)
 
-- **状态**: ☑ done (PR #TBD, 2026-05-20)
-- **Owns**: `visitor/src/views/theme-images/**`(新增)、`visitor/src/router/route.ts` 加一行
-- **依赖**: P0-4
-- ⚠️ 本任务**例外**地需要改 `route.ts`(加一行 `/theme-images`),开 PR 前请先通知用户、避免和其他 PR 撞期。如果用户接受,可以一并放进 P0-5 一起做(更稳)
+- **状态**: 🚫 removed (P2-5, 2026-05-20)
 - **历史**:
-  - 2026-05-20 PR #TBD 从 `access/src/views/theme-images/index.vue`(627 行)1:1 复制到 `visitor/src/views/theme-images/index.vue`(prettier 格式化,无逻辑差异)。所有 import 均为 `/@/stores/themeConfig`、`/@/utils/{commonFunction,themeImages,themeSkin}`,visitor 已全部具备(P0-4 已落地)。同时在 `visitor/src/router/route.ts` 的 `dynamicRoutes` 末尾追加 `/theme-images` 路由(icon `ele-Picture`,title 「主题图片库」,enName 「Theme Asset Library」);此为冻结后 route.ts 的例外修改,与 C11 例外同型,父会话集中处理。同 PR 顺手清理 MIGRATION_TASKS.md 中的 C11 重复章节(原 PR #21 留下 pending 副本 + PR #22 增补 done 副本未合并,本 PR 合二为一并把 PR # 从 #TBD 回填为 #22)。
+  - 2026-05-20 PR #TBD 从 access 复制主题图片库页面到 `visitor/src/views/theme-images/`,并在 route.ts 增加 `/theme-images` 路由（本期内交付）
+  - 2026-05-20 P2-5 决议：主题图片库不属于 visitor 业务范围，P2-5 PR #TBD 一次性删除 `/theme-images` 路由与 `visitor/src/views/theme-images/` 目录（`utils/themeImages.ts` 等主题工具仍由登录页 / 主题切换继续使用，不动）
 
 ### D5. 登录页对齐
 
@@ -443,6 +414,30 @@
 - **依赖**: P2-1
 - **内容**: 在 main-app 中以 qiankun 方式加载 visitor,验证「返回统一门户」按钮、菜单跳转、所有迁移页面都能打开
 - **历史**:
+
+## P2-5. 访客菜单收口（剔除多余菜单与文档）
+
+- **状态**: 🟡 in-progress (P2-5, devin/<unix>-P2-5-visitor-menu-cleanup)
+- **Owns**:
+  - `visitor/src/router/route.ts`（剔除 7 条多余路由 + 新增 `menuRoutes` 父级分组导出）
+  - `visitor/src/router/backEnd.ts`（`setRoutesList` 改用 `menuRoutes`）
+  - `visitor/src/views/permission/position/**`（删）
+  - `visitor/src/views/permission/space/**`（删）
+  - `visitor/src/views/portal/**`（删：整个 portal/ 目录）
+  - `visitor/src/views/theme-images/**`（删）
+  - `visitor/MIGRATION_TASKS.md`（本任务章节 + C4 / C5 / C7~C10 / D4 章节收口）
+- **依赖**: 无（纯清理）
+- **内容**: 根据用户决议，visitor 子应用左侧菜单只保留以下 7 条：
+  - 访客总览 / 预约记录 / 通行记录 / 黑名单管理 / 访客配置 / 园区访客管理说明
+  - 「**设置**」父级（子项：用户管理 / 角色管理 / 组织管理 / 菜单管理）
+
+  其余条目（空间管理 / 岗位管理 / 子应用管理 / AI 工具中心 / 应用分类 / 工作台配置 / 主题图片库）属于需求整理错误，本任务一次性物理删除对应路由、视图文件与文档章节。
+
+  实现要点：
+  - `route.ts` 中 `dynamicRoutes` 保持**扁平**（vue-router 实际注册），新增 `menuRoutes` 导出**带「设置」父级分组**（仅用于 aside 菜单渲染）；`backEnd.ts` 中 `storesRoutesList.setRoutesList(...)` 由 `baseRoutes[0].children` 改为 `menuRoutes`。
+  - `MIGRATION_TASKS.md` 中 C4 / C5 / C7~C10 / D4 共 6 个章节由「🚫 cancelled」收口为「🚫 removed (P2-5)」。
+- **历史**:
+  - 2026-05-20 PR #TBD 清理访客子应用左侧菜单与对应视图 / 路由 / 文档章节，并引入 `menuRoutes` 父级分组以支持「设置」父级菜单展示
 
 ## P2-3. 最终 lint + build
 
