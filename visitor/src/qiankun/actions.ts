@@ -84,7 +84,7 @@ export function destroyGlobalStateListener() {
 	}
 }
 // 子应用路由同步
-export const syncSubAppRoute = (to: any, from: any) => {
+export const syncSubAppRoute = (to: any, _from: any) => {
 	let basePath = import.meta.env.VITE_QIANKUN_NAME;
 	let hashUrl = location.hash;
 	let targetPath = `/#/${basePath}${to.fullPath}`;

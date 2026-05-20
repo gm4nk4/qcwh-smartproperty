@@ -46,7 +46,6 @@ const {t} = useI18n();
 
 // 定义变量内容
 const dataFormRef = ref();
-const deptTreeRef = ref();
 const visible = ref(false);
 const loading = ref(false);
 

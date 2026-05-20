@@ -9,7 +9,7 @@
 		"dev": "vite --force",
 		"build": "cross-env NODE_OPTIONS=--max-old-space-size=4096 vite build",
 		"build:docker": "cross-env NODE_OPTIONS=--max-old-space-size=4096 vite build --outDir ./docker/dist/",
-		"lint:eslint": "eslint --fix --ext .js,.cjs,.mjs,.ts,.vue ./src",
+		"lint:eslint": "cross-env ESLINT_USE_FLAT_CONFIG=false eslint --fix --ext .js,.cjs,.mjs,.ts,.vue ./src",
 		"prettier": "prettier --write ."
 	},
 	"dependencies": {

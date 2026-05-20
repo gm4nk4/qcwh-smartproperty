@@ -10,7 +10,7 @@
 			class="custom-tree"
 			@node-click="handleNodeClick"
 		>
-			<template #default="{ node, data }">
+			<template #default="{ data }">
 				<div class="tree-node" :class="{ isLeaf: isLeaf(data) }">
 					<div class="node-content" :class="{ active: selectedNodeId === data.id }">
 						<div class="node-main">
@@ -73,7 +73,7 @@ interface Props {
 	selectedNodeId?: number;
 }
 
-const props = withDefaults(defineProps<Props>(), {
+withDefaults(defineProps<Props>(), {
 	data: () => [],
 	treeType: 'border',
 	selectedNodeId: undefined,

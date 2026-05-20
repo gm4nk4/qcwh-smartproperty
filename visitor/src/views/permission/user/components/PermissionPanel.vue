@@ -103,7 +103,7 @@
 import { CircleCheck, Share } from '@element-plus/icons-vue';
 import type { PlatformRole, SubAppPermission } from '../type';
 
-const props = defineProps<{
+defineProps<{
 	platformRoles: PlatformRole[];
 	subAppPermissions: SubAppPermission[];
 }>();

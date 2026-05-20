@@ -55,7 +55,7 @@ export function removeDuplicate(arr: EmptyArrayType, attr?: string) {
 		if (attr) {
 			const obj: EmptyObjectType = {};
 			return arr.reduce((cur: EmptyArrayType[], item: EmptyArrayType) => {
-				obj[item[attr]] ? '' : (obj[item[attr]] = true && item[attr] && cur.push(item));
+				obj[item[attr]] ? '' : (obj[item[attr]] = item[attr] && cur.push(item));
 				return cur;
 			}, []);
 		} else {

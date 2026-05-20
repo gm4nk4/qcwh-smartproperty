@@ -1,5 +1,4 @@
 import type { QueryFormConfig, TableColumn } from '@zhqc-smart/table';
-import type { VisitorAccessStatus } from './api';
 
 export interface AccessRecordFormData {
 	visitorName: string;

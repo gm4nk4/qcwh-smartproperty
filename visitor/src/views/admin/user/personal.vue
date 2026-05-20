@@ -92,10 +92,9 @@
 
 <script setup lang="ts" name="personal">
 import {useUserInfo} from '/@/stores/userInfo';
-import {editInfo, getObj, password, UnbindingUser} from '/@/api/admin/user';
+import {editInfo, getObj, password} from '/@/api/admin/user';
 import {useMessage} from '/@/hooks/message';
 import {rule} from '/@/utils/validate';
-import other from '/@/utils/other';
 import {Session} from '/@/utils/storage';
 import {useI18n} from 'vue-i18n';
 

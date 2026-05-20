@@ -20,7 +20,7 @@ export const dict = defineStore('dict', {
 			try {
 				const item = this.dict.find((item) => item.key === key);
 				return item ? item.value : null;
-			} catch (e) {
+			} catch (_e) {
 				return null;
 			}
 		},
@@ -51,7 +51,7 @@ export const dict = defineStore('dict', {
 					this.dict.splice(index, 1);
 					return true;
 				}
-			} catch (e) {
+			} catch (_e) {
 				return false;
 			}
 			return false;

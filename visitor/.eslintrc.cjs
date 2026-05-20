@@ -56,7 +56,10 @@ module.exports = {
 		'@typescript-eslint/explicit-module-boundary-types': 'off', //  不强制模块导出写类型
 		'@typescript-eslint/no-redeclare': 'error', //  禁止重复定义（报错）
 		'@typescript-eslint/no-non-null-asserted-optional-chain': 'off', //  允许可选链后用非空断言
-		'@typescript-eslint/no-unused-vars': [2], //  未使用变量（报错）
+		'@typescript-eslint/no-unused-vars': [
+			'error',
+			{ argsIgnorePattern: '^_', varsIgnorePattern: '^_', caughtErrorsIgnorePattern: '^_' },
+		], //  未使用变量（报错），以下划线前缀可豁免
 
 		// -------------------------- Vue 相关规则 --------------------------
 		'vue/custom-event-name-casing': 'off', //  不限制自定义事件命名格式
@@ -91,9 +94,9 @@ module.exports = {
 		'generator-star-spacing': 'off', //  不强制 generator 空格格式
 		'no-unreachable': 'off', //  允许不可达代码
 		'no-case-declarations': 'off', //  允许 case 内声明变量
-		'no-console': 'error', //  禁止 console（报错）
+		'no-console': 'warn', //  console 仅警告，不阻塞 lint（Phase 2 P2-3 决议）
 		'no-redeclare': 'off', //  允许重复声明
 		'no-mixed-spaces-and-tabs': 'off', //  允许空格和 tab 混用
-		'no-unused-vars': 'error', //  未使用变量（报错）
+		'no-unused-vars': 'off', //  关闭（与 @typescript-eslint/no-unused-vars 重复，由 TS 版本统一处理）
 	},
 };

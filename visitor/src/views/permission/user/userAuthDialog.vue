@@ -126,8 +126,8 @@
  */
 import { ref, computed } from 'vue';
 import { ElMessage } from 'element-plus';
-import { Close, Box, Connection, CircleCheck, Share, DataLine } from '@element-plus/icons-vue';
-import type { UserAuthDialogProps, UserAuthDialogEmits, UserInfo, AuthSubApp as SubApp } from './type';
+import { Box, Connection, CircleCheck, Share, DataLine } from '@element-plus/icons-vue';
+import type { UserAuthDialogProps, UserAuthDialogEmits, AuthSubApp as SubApp } from './type';
 import { mockAuthSubAppList as mockSubAppList } from './mock';
 
 const props = defineProps<UserAuthDialogProps>();

@@ -352,7 +352,7 @@ export const getVisitorAppointmentPage = async (
 	return Promise.resolve({
 		code: 0,
 		data: {
-			records: filtered.slice(start, end).map(({ passRecords, ...item }) => item),
+			records: filtered.slice(start, end).map(({ passRecords: _passRecords, ...item }) => item),
 			total: filtered.length,
 			current: params.current,
 			size: params.size,
