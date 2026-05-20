@@ -366,11 +366,12 @@
 
 ### D3. admin 用户/角色页面同步
 
-- **状态**: ☐ pending
+- **状态**: ☑ done (PR #TBD, 2026-05-20)
 - **Owns**: `visitor/src/views/admin/user/**`
 - **依赖**: P0-1, P0-3
 - **内容**: 把 access 的 `UserAuthDialog.vue`、`userDetail.vue`、`mock.ts`、`type.ts`、`components/` 复制过来,使后台 admin 模块与 access 一致
 - **历史**:
+  - 2026-05-20 PR #TBD 从 `access/src/views/admin/user/` 复制 `UserAuthDialog.vue`、`userDetail.vue`、`mock.ts`、`type.ts`、`components/{PermissionPanel.vue,UserInfoPanel.vue}` 到 `visitor/src/views/admin/user/` 同名路径,内容与 access 完全一致(diff 无差异)。所有 import 均为相对路径(`./mock`、`./type`、`./components/*`)或第三方包(`vue`、`element-plus`、`@element-plus/icons-vue`),无 `/@/` 别名依赖,visitor 已有相同版本的 element-plus 2.13.1 + @element-plus/icons-vue 2.3.2,无需补充依赖。未改 `index.vue`/`form.vue`/`personal.vue`/`i18n/`(本任务范围仅同步上述新增文件)。本地 `npx prettier --write src/views/admin/user/` 通过;`npm run dev` HTTP 200。
 
 ### D4. 主题图片库
 
