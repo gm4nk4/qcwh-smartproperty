@@ -274,6 +274,22 @@ export const dynamicRoutes: Array<RouteRecordRaw> = [
 			icon: 'ele-Suitcase',
 		},
 	},
+	// C11 例外:菜单管理(系统设置)— P0-5 未占位,本任务加一行路由
+	{
+		path: '/set/menu',
+		name: 'set.menu',
+		component: () => import('/@/views/set/menu/index.vue'),
+		meta: {
+			title: '菜单管理',
+			enName: 'Menu Management',
+			isLink: '',
+			isHide: false,
+			isKeepAlive: false,
+			isAffix: false,
+			isIframe: false,
+			icon: 'ele-Operation',
+		},
+	},
 ];
 
 /**

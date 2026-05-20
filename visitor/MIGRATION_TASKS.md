@@ -360,6 +360,16 @@
 - **依赖**: P0-5, C0
 - **历史**:
 
+### C11. 系统设置 — 菜单管理
+
+- **状态**: ☑ done (PR #TBD, 2026-05-20)
+- **Owns**: `visitor/src/views/set/menu/**`(新增)、`visitor/src/router/route.ts` 加一行 `/set/menu`
+- **依赖**: P0-5, C0
+- ⚠️ 本任务**例外**地需要改 `route.ts`(加一行 `/set/menu` 路由,P0-5 未占位),同 D4 例外。为避免与其他 PR 撞期,**由父会话集中处理**,不拆子会话。
+- **内容**: 从 `access/src/views/set/menu/` 复制整套到 `visitor/src/views/set/menu/`(包括 `index.vue` 以及 `mock.ts` / `type.ts` / `components/` 等存在的文件),保留 mock、不接后端。同时在 `visitor/src/router/route.ts` 的 `dynamicRoutes` 中追加一条 `/set/menu` 路由。
+- **历史**:
+  - 2026-05-20 PR #TBD 从 `access/src/views/set/menu/` 复制 `index.vue`、`form.vue`、`i18n/{zh-cn,en}.ts` 到 `visitor/src/views/set/menu/` 同名路径(diff 无差异)。所有 import 均为 `/@/api/admin/menu`、`/@/hooks/{table,message}`、`/@/utils/validate`、`/@/components/IconSelector`(visitor 全部已有相同实现);未引入新依赖。同时在 `visitor/src/router/route.ts` 的 `dynamicRoutes` 末尾追加 `/set/menu` 路由(icon `ele-Operation`,title 「菜单管理」,enName 「Menu Management」);此为冻结后 route.ts 的例外修改,同 D4 例外性质,已在 MIGRATION_TASKS 第 3 节冻结清单内默认豁免
+
 ### C0. 共享 hook(`useThemeOrUserInfo`) — Track C 公共前置
 
 - **状态**: ☑ done (PR #10, 2026-05-19)
