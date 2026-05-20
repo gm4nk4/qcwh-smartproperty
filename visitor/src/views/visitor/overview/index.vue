@@ -77,6 +77,7 @@
 								:label="column.label"
 								:min-width="column.minWidth"
 								:fixed="column.type === 'enterprise' ? 'left' : false"
+								:align="column.type === 'enterprise' ? 'left' : 'center'"
 							>
 								<template #default="{ row }">
 									<div v-if="column.type === 'enterprise'" class="visitor-overview__enterprise-cell">
@@ -475,6 +476,28 @@ onUnmounted(() => {
 	:deep(.el-table__row td.el-table__cell) {
 		padding-top: 14px;
 		padding-bottom: 14px;
+	}
+
+	// 表格隐藏滚动条但保留滑轮滚动能力：
+	// 1. Element Plus 2.x 的 el-table 内部用 el-scrollbar 包裹表体，
+	//    隐藏 .el-scrollbar__bar 即可隐去自绘滚动条，轴反应仍由
+	//    .el-scrollbar__wrap 上的 wheel/scroll 处理正常走；
+	// 2. 同时隐去原生滚动条（Firefox 用 scrollbar-width，WebKit
+	//    用 ::-webkit-scrollbar，Edge 用 -ms-overflow-style）充当后路。
+	:deep(.el-scrollbar__bar) {
+		display: none !important;
+	}
+
+	:deep(.el-scrollbar__wrap),
+	:deep(.el-table__body-wrapper) {
+		scrollbar-width: none;
+		-ms-overflow-style: none;
+
+		&::-webkit-scrollbar {
+			width: 0;
+			height: 0;
+			display: none;
+		}
 	}
 }
 
