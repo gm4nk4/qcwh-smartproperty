@@ -132,15 +132,29 @@ const visitorRoutes: Array<RouteRecordRaw> = [
 // menuRoutes 中会以「设置」为父菜单把这 4 条合并展示，
 // dynamicRoutes 中保持扁平以避免 vue-router 嵌套注册。
 //
-// 注意：visitor 子应用在 qiankun 主应用下挂载于 `/visitor` 前缀（见
+// 注意 1：visitor 子应用在 qiankun 主应用下挂载于 `/visitor` 前缀（见
 // main-app/src/config/apps.ts `routePath: '/visitor'`）。子应用使用 hash
 // 路由，因此所有路由 path **必须**以 `/visitor/` 起始，否则跳转后主应用
 // qiankun activeRule 不再匹配，会把 visitor 卸载并落到 404。
+//
+// 注意 2：公共 `@zhqc-smart/layout` 的 `navMenu/subItem.vue` 渲染 sub-item 时
+// 读取 `val.level` 计算 `marginLeft = val.level * 18 + 'px'` 及 CSS 变量
+// `--before-left = -(val.level * 18) + 'px'`。后者驱动选中态蓝色 marker 条
+// （`.layout-nav-menu__child.is-active::before` 的 `left`）的位置。不设 `level`
+// 时 `undefined * 18 = NaN` 会产生非法 CSS 被丢弃 → marker 条取默认位置贴
+// 到文字左侧。与 access mockRoute 的 leaf 子菜单保持一致：leaf 项都设
+// `level: 2`，缩进 36px 同时把 marker 条推到菜单最左。
+//
+// `level` 不是 vue-router `RouteRecordRaw` 原生字段（是公共 layout 约定的菜
+// 单渲染字段），为避免 TS 多余属性检查，下面 4 条 leaf 路由不加
+// `: RouteRecordRaw` 显式标注，仅依靠 `settingsRoutes: Array<RouteRecordRaw>`
+// 的数组类型做结构兼容检查；level 在运行时依然存在供 subItem.vue 读取。
 // ---------------------------------------------------------------------------
-const userRoute: RouteRecordRaw = {
+const userRoute = {
 	path: '/visitor/permission/user',
 	name: 'permission.user',
 	component: () => import('/@/views/permission/user/index.vue'),
+	level: 2,
 	meta: {
 		title: '用户管理',
 		enName: 'User Management',
@@ -153,10 +167,11 @@ const userRoute: RouteRecordRaw = {
 	},
 };
 
-const roleRoute: RouteRecordRaw = {
+const roleRoute = {
 	path: '/visitor/permission/role',
 	name: 'permission.role',
 	component: () => import('/@/views/permission/role/index.vue'),
+	level: 2,
 	meta: {
 		title: '角色管理',
 		enName: 'Role Management',
@@ -169,10 +184,11 @@ const roleRoute: RouteRecordRaw = {
 	},
 };
 
-const organizationRoute: RouteRecordRaw = {
+const organizationRoute = {
 	path: '/visitor/permission/organization',
 	name: 'permission.organization',
 	component: () => import('/@/views/permission/organization/index.vue'),
+	level: 2,
 	meta: {
 		title: '组织管理',
 		enName: 'Organization Management',
@@ -185,10 +201,11 @@ const organizationRoute: RouteRecordRaw = {
 	},
 };
 
-const menuRoute: RouteRecordRaw = {
+const menuRoute = {
 	path: '/visitor/set/menu',
 	name: 'set.menu',
 	component: () => import('/@/views/set/menu/index.vue'),
+	level: 2,
 	meta: {
 		title: '菜单管理',
 		enName: 'Menu Management',
