@@ -254,11 +254,12 @@
 
 ### B3. 黑名单管理
 
-- **状态**: ☐ pending
+- **状态**: ☑ done (PR #14, 2026-05-20)
 - **Owns**: `visitor/src/views/visitor/blacklist/**`
 - **依赖**: P0-1, P0-2, P0-3
 - **内容**: 接入 `ConfigurableTableWithForm`,保留"新增/移除"及新增弹窗
 - **历史**:
+  - 2026-05-20 PR #14 黑名单管理页接入 `ConfigurableTableWithForm`,`#tableActions` 槽位放新增按钮,操作列保留移除,新增弹窗保留
 
 ### B4. 访客配置
 

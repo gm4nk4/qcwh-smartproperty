@@ -2,7 +2,6 @@ import type { CreateVisitorBlacklistParams, VisitorBlacklistItem, VisitorBlackli
 import type { BlacklistDialogFormData, BlacklistPageFormData } from './index';
 
 export interface BlacklistTableRow extends VisitorBlacklistItem {
-	seq: number;
 	typeLabel: string;
 	identityDisplay: string;
 }
@@ -33,10 +32,9 @@ export const buildBlacklistQueryParams = (formData: BlacklistPageFormData): Visi
 	};
 };
 
-export const buildBlacklistTableRows = (records: VisitorBlacklistItem[], current: number, size: number): BlacklistTableRow[] => {
-	return records.map((item, index) => ({
+export const buildBlacklistTableRows = (records: VisitorBlacklistItem[]): BlacklistTableRow[] => {
+	return records.map((item) => ({
 		...item,
-		seq: (current - 1) * size + index + 1,
 		typeLabel: blacklistTypeLabelMap[item.type],
 		identityDisplay: formatValue(item.identityValue),
 	}));
