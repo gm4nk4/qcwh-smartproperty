@@ -546,6 +546,33 @@
 - **历史**:
   - 2026-05-20 PR #TBD `visitor/src/views/visitor/overview/useBizProcess.ts` 调整 `buildTrendChartOption`：堆叠柱顶圆角下沉到 data 级别仅在最顶段生效；加 1px 白色 border 分段；收窄柱宽到 20；图例间距、tooltip 提示色、hover 阴影一同微调
 
+## P2-10. 访客总览「各企业到访明细」表头/单元格对齐 + 隐藏滚动条但保留滚轮
+
+- **状态**: 🟡 in-progress (P2-10, devin/<unix>-P2-10-visitor-overview-table-align-and-scrollbar)
+- **Owns**:
+  - `visitor/src/views/visitor/overview/index.vue`（仅趋势表格的 `el-table-column` 对齐参数 + `.visitor-overview__table` 样式块）
+  - `visitor/MIGRATION_TASKS.md`（仅本任务章节）
+- **依赖**: B5（访客总览页骨架已落地）、P2-9（趋势模块视觉打磨）
+- **背景**: 用户反馈：
+  - 「各企业到访明细（最近5天）」表头（03-16 / 03-17 / ...）默认左对齐，而单元格内容 `7人` + 车辆 icon+数字是居中显示，导致表头看着偏左、列对不齐
+  - 希望表格在内容需要滚动时隐藏滚动条（横向 / 纵向都不显示），但鼠标滚轮**必须**能正常垂直滚动
+- **修复**: 仅在 `visitor/src/views/visitor/overview/index.vue`：
+  - `el-table-column` 加 `:align="column.type === 'enterprise' ? 'left' : 'center'"`：「企业」列仍左对齐（带颜色圆点 + 企业名称），其余指标列表头与数据一起居中，与单元格中已有的 `text-align: center` 视觉一致
+  - `.visitor-overview__table` 样式块新增两段 CSS：
+    1. `:deep(.el-scrollbar__bar) { display: none !important; }` 隐藏 Element Plus 2.x 中 el-table 内置 el-scrollbar 的自绘滚动条；滚轮 / wheel 事件由 `.el-scrollbar__wrap` 接收处理，不受 `display:none` 的轨道影响
+    2. `:deep(.el-scrollbar__wrap), :deep(.el-table__body-wrapper)` 上同时设 `scrollbar-width: none`（Firefox）、`-ms-overflow-style: none`（旧 Edge / IE）以及 `&::-webkit-scrollbar { width: 0; height: 0; display: none; }`（Chromium / Safari）兜底原生滚动条
+- **保持不动**:
+  - `useBizProcess.ts` 中 `buildTrendTableColumns` / `buildTrendTableRows`：列定义、最小宽度、合计列都不动
+  - 公共 layout / 主题 token / 任何样式文件
+  - 图表 / 顶部 metric 卡片 / 「访客数据概览」/ 工具栏
+- **校验**（本机由用户跑，VM 不跑 build / install）:
+  - 「各企业到访明细」表格表头与单元格在列宽内视觉对齐：企业列左对齐，5 个日期列 + 合计列居中
+  - 表格滚动条不可见（横向 / 纵向都不出现自绘或原生滚动条），但鼠标在表格上滚动滚轮时能正常垂直滚动
+  - 公共 layout 自身的 `el-scrollbar`（页外侧栏 / 顶栏等）的滚动条不被波及，因为样式作用域被 `.visitor-overview__table` 包住
+  - `npm run lint:eslint` 0 error（沿用 P2-3 基线）
+- **历史**:
+  - 2026-05-20 PR #TBD `visitor/src/views/visitor/overview/index.vue` 表格 `el-table-column` 增加按列类型派发的 `align`；样式块追加 el-scrollbar / native scrollbar 两层隐藏 CSS 保留滚轮能力
+
 ## P2-3. 最终 lint + build
 
 - **状态**: ☑ done (PR #TBD, 2026-05-20)
