@@ -51,6 +51,11 @@ const viteConfig = defineConfig((mode: ConfigEnv) => {
 		base: mode.command === 'serve' ? './' : env.VITE_PUBLIC_PATH,
 		optimizeDeps: {
 			include: ['element-plus/es/locale/lang/zh-cn', 'element-plus/es/locale/lang/en'],
+			// `@zhqc-smart/*` 公共包通过 `file:` 软链引入,内部以 `new URL('../../asset/...', import.meta.url)`
+			// 方式引用图片资源(如左侧菜单底部折叠/展开图标 fold/expand)。若让 Vite/esbuild 预打包,
+			// 这些 URL 会被绑定到 `node_modules/.vite/deps/` 下的伪路径,导致图片 404。
+			// 与 access / parking 子应用保持一致,统一从预构建里排除,改由 Vite 直接以 ESM 源码处理。
+			exclude: ['@zhqc-smart/layout', '@zhqc-smart/table', '@zhqc-smart/settings', '@zhqc-smart/admin'],
 		},
 		server: {
 			host: '0.0.0.0',
