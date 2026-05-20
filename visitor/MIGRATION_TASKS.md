@@ -441,19 +441,25 @@
 
 ## P2-6. 修复 visitor 左侧菜单底部 fold/expand 图标在 dev 模式丢失
 
-- **状态**: 🟡 in-progress (P2-6, devin/<unix>-P2-6-visitor-menu-footer-icon)
+- **状态**: 🟡 in-progress (P2-6 follow-up, devin/<unix>-P2-6-vite-fs-allow)
 - **Owns**:
   - `visitor/vite.config.ts`
   - `visitor/MIGRATION_TASKS.md`（仅本任务章节）
 - **依赖**: P0-3（visitor 已接入 `@zhqc-smart/layout`）
 - **背景**: 公共 `@zhqc-smart/layout` 的左侧菜单底部由 `vertical.vue` 渲染一个 `.layout-nav-menu__footer`，里面装的是 `breadcrumb.vue` 的折叠 / 展开切换图标（`fold.png` / `expand.png`，由 `new URL('../../asset/images/...', import.meta.url)` 引用）。parking / access 子应用底部能正常看到这枚图标，visitor 看不到。
-- **根因**: visitor 的 `vite.config.ts` 在 `optimizeDeps` 里未把 `@zhqc-smart/*` 公共包加入 `exclude`，于是 Vite/esbuild 在 dev 启动时会把这些 `file:` 软链包预构建到 `node_modules/.vite/deps/` 下。预构建后的 chunk 里 `import.meta.url` 指向的是 `.vite/deps/` 路径，`new URL('../../asset/images/expand.png', import.meta.url)` 会被解析成 `node_modules/.vite/asset/images/expand.png` 这种不存在的伪路径，图片 404，菜单底部就什么也看不到。parking 子应用因为已经显式 `exclude: ['@zhqc-smart/layout', ...]`，公共包直接以源码 ESM 形式被 Vite 处理，`import.meta.url` 指向原始 `.vue` 源文件位置，资源路径解析正确。
-- **修复**: 在 `visitor/vite.config.ts` 的 `optimizeDeps` 下新增 `exclude: ['@zhqc-smart/layout', '@zhqc-smart/table', '@zhqc-smart/settings', '@zhqc-smart/admin']`（visitor 实际仅 import 这 4 个 `@zhqc-smart` 包，与 parking 对齐），不再预构建公共组件库。
-- **校验**:
+- **根因**: 共两层 dev-only 配置缺失，缺一不可：
+  1. `optimizeDeps` 未把 `@zhqc-smart/*` 公共包列入 `exclude`，Vite/esbuild 会把这些 `file:` 软链包预构建到 `node_modules/.vite/deps/` 下，`import.meta.url` 指向 `.vite/deps/` 伪路径，`new URL('../../asset/images/expand.png', import.meta.url)` 解析成 `node_modules/.vite/asset/images/expand.png` → 404。（PR #31 已修复）
+  2. `server.fs.allow` 未放行 `../components`。`@zhqc-smart/*` 通过 `file:../components/packages/*` 引入，npm 会建一条 `node_modules/@zhqc-smart/layout → ../../components/packages/layout` 软链；Vite 默认 `resolve.preserveSymlinks: false`，会把这条软链解析到 `components/packages/layout/**` 真实路径（位于 visitor 项目根之外）。Vite 5 默认 `server.fs.strict: true`，根外文件被 dev 服务器拦截 → `fold.png` / `expand.png` 仍 403/404，菜单底部依旧看不到图标。access / parking 在 `server.fs.allow` 里显式放行了 `../components`，所以图标正常。
+- **修复**:
+  1. （PR #31）在 `optimizeDeps.exclude` 加入 `['@zhqc-smart/layout', '@zhqc-smart/table', '@zhqc-smart/settings', '@zhqc-smart/admin']`，不再预构建公共组件库。
+  2. （本 PR）在 `server.fs.allow` 加入 `[resolve(__dirname), resolve(__dirname, '../components')]`，与 access / parking 一致，让 dev server 能透过软链读到 `components/packages/layout/src/asset/images/{fold,expand}.png`。
+- **校验**（本机由用户跑，VM 不跑 build/install）:
   - `npm run lint:eslint` 0 error（沿用 P2-3 基线）
-  - `npm run build` 通过
+  - `npm run dev` 启动后左下角菜单底部折叠 / 展开图标可见且可点击切换
+  - `npm run build` 通过（生产构建不受影响，本次修改仅改 dev server 配置）
 - **历史**:
-  - 2026-05-20 PR #TBD `visitor/vite.config.ts` 在 `optimizeDeps.exclude` 加入 `@zhqc-smart/{layout,table,settings,admin}`，恢复 dev 模式下左侧菜单底部折叠 / 展开图标渲染
+  - 2026-05-20 PR #31 `visitor/vite.config.ts` 在 `optimizeDeps.exclude` 加入 `@zhqc-smart/{layout,table,settings,admin}`（dev 模式首轮修复，未生效）
+  - 2026-05-20 PR #TBD `visitor/vite.config.ts` 在 `server.fs.allow` 放行 `../components`，与 access / parking 对齐，恢复 dev 模式下左侧菜单底部折叠 / 展开图标渲染
 
 ## P2-3. 最终 lint + build
 
