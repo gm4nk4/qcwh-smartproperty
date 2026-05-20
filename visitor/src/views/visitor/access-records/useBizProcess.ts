@@ -1,23 +1,9 @@
-import type {
-	VisitorAccessRecordDetail,
-	VisitorAccessRecordItem,
-	VisitorAccessRecordPageParams,
-	VisitorAccessRecordPassItem,
-	VisitorAccessStatus,
-} from './api';
+import type { VisitorAccessRecordDetail, VisitorAccessRecordPageParams, VisitorAccessRecordPassItem, VisitorAccessStatus } from './api';
 import type { AccessRecordFormData, DetailSectionConfig } from './index';
 
 export interface StatusTagMeta {
 	label: string;
 	className: string;
-}
-
-export interface AccessRecordTableRow extends VisitorAccessRecordItem {
-	seq: number;
-	statusText: string;
-	statusClassName: string;
-	passTypeLabel: string;
-	passMethodLabel: string;
 }
 
 export interface AccessRecordDetailSectionItem {
@@ -101,20 +87,6 @@ export const buildAccessRecordQueryParams = (formData: AccessRecordFormData): Vi
 
 export const getAccessRecordStatusMeta = (status: VisitorAccessStatus): StatusTagMeta => {
 	return statusMetaMap[status];
-};
-
-export const buildAccessRecordTableRows = (records: VisitorAccessRecordItem[], current: number, size: number): AccessRecordTableRow[] => {
-	return records.map((item, index) => {
-		const statusMeta = getAccessRecordStatusMeta(item.status);
-		return {
-			...item,
-			seq: (current - 1) * size + index + 1,
-			statusText: statusMeta.label,
-			statusClassName: statusMeta.className,
-			passTypeLabel: getPassTypeLabel(item.passType),
-			passMethodLabel: getPassMethodLabel(item.passMethod),
-		};
-	});
 };
 
 export const buildAccessRecordDetailSections = (
