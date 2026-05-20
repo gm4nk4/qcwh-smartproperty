@@ -296,11 +296,12 @@
 
 ### C2. 用户管理
 
-- **状态**: ☐ pending
+- **状态**: ☑ done (PR #TBD, 2026-05-20)
 - **Owns**: `visitor/src/views/permission/user/**`
 - **依赖**: P0-1, P0-3, P0-5(占位路由已加),C-COMMON-HOOK(`useThemeOrUserInfo`,见 C0)
 - **内容**: 复制 access 对应目录的 `index.vue`、`userDetail.vue`、`userAuthDialog.vue`、`userEditDialog.vue`、`userResetPwdDialog.vue`、`mock.ts`、`type.ts`、`components/`
 - **历史**:
+  - 2026-05-20 PR #TBD 从 `access/src/views/permission/user/` 1:1 复制 `index.vue`、`userDetail.vue`、`userAuthDialog.vue`、`userEditDialog.vue`、`userResetPwdDialog.vue`、`mock.ts`、`type.ts`、`components/{PermissionPanel,UserInfoPanel}.vue` 到 visitor 同名路径,覆盖 P0-5 占位 `index.vue`。沿用 `@zhqc-smart/table` 的 `ConfigurableTableWithForm`、`/@/hooks/{message,useThemeOrUserInfo}`、`@element-plus/icons-vue`,**保留 mock 数据,不接后端**,**未改 route.ts / package.json / i18n/lang**(模块内目前未引入独立 i18n 文件,与 access 源保持一致;Phase 2 统一收口)。**校验**:`npm install` OK;`npm run dev` HTTP 200,`/permission/user` 路由及全部组件(`userDetail.vue` / `userAuthDialog.vue` / `userEditDialog.vue` / `userResetPwdDialog.vue` / `components/PermissionPanel.vue` / `components/UserInfoPanel.vue`)均编译 200;`npx prettier --write src/views/permission/user/` 通过
 
 ### C3. 角色管理
 
