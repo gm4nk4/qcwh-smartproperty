@@ -190,4 +190,12 @@ export default {
 		btnTwo: 'Update Now',
 		btnTwoLoading: 'Updating',
 	},
+	// page.* consolidated from visitor/src/views/login/i18n/en.ts by P2-1 (used by access-aligned login template)
+	page: {
+		welcome: 'Welcome',
+		subtitle: 'Please enter your username and password',
+		username: 'Username',
+		password: 'Password',
+		imageCode: 'Image verification code',
+	},
 };
