@@ -277,11 +277,12 @@
 
 ### B6. 园区访客管理说明
 
-- **状态**: ☐ pending
+- **状态**: ☑ done (PR #TBD, 2026-05-20)
 - **Owns**: `visitor/src/views/visitor/park-guide/**`
 - **依赖**: P0-3
 - **内容**: 样式微调 + 栅格对齐
 - **历史**:
+  - 2026-05-20 PR #TBD 对齐 visitor 其他页面样式规范:body 背景加双层 radial-gradient,gap 18→16px;面板 padding 20→18px、background `#fff`→`rgba(255,255,255,0.95)`;workspace gap 18→16px;媒体查询断点 1200/768 → 1440/992/640 与其他 visitor 页面对齐
 
 ## Track C — 「统一门户 + 统一权限」模块迁移
 
