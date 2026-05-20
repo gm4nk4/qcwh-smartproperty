@@ -382,10 +382,11 @@
 
 ### D5. 登录页对齐
 
-- **状态**: ☐ pending
+- **状态**: ☑ done (PR #TBD, 2026-05-20)
 - **Owns**: `visitor/src/views/login/**`
 - **依赖**: P0-1, P0-4
 - **历史**:
+  - 2026-05-20 PR #TBD 把 `visitor/src/views/login/index.vue` 重写为 access 的 `.login-page__*` 结构（brand header / hero / panel / card / footer），引入 `useThemeImage('loginBackground')` 与 `useThemeImage('brandBadge')` 主题图。`visitor/src/views/login/component/password.vue` 改为 access 同款 `login-field` + `login-field__label` 表单(去掉 prefix 图标,新增 `login-password-toggle` 显隐密码按钮,验证码改用 `login-verify-row` 网格);保留 visitor 既有的 `isQiankun` 验证码 URL 逻辑(不动认证逻辑)。新增 `visitor/src/views/login/i18n/{zh-cn,en}.ts` 补齐 `page.welcome/subtitle/username/password/imageCode` i18n 键(走自动 glob 注入,不动 `i18n/lang/*` 与 `i18n/pages/login/*`)。`visitor/src/theme/login.scss` 不在 Owns 之内,所有新结构样式以未 scoped `<style lang="scss">` 块内联在 `index.vue` 中,与原有旧布局类名(`.login-container/.wave/.img/.login-box`)互不冲突。`mobile.vue` 与 `register.vue` 当前已与 access 一致,保持原样未改动。`npm run dev` 验证通过(HTTP 200,`/#/login` 可访问)。
 
 ---
 

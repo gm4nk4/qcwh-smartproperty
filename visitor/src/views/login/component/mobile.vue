@@ -52,9 +52,12 @@ const loginForm = reactive({
 
 // 定义校验规则
 const loginRules = reactive({
-	mobile: [{validator: rule.overLength, trigger: 'blur'},{ required: true, trigger: 'blur', validator: rule.validatePhone }],
+	mobile: [
+		{ validator: rule.overLength, trigger: 'blur' },
+		{ required: true, trigger: 'blur', validator: rule.validatePhone },
+	],
 	code: [
-		{validator: rule.overLength, trigger: 'blur'},
+		{ validator: rule.overLength, trigger: 'blur' },
 		{
 			required: true,
 			trigger: 'blur',
