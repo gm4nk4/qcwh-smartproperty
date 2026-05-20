@@ -441,7 +441,7 @@
 
 ## P2-6. 修复 visitor 左侧菜单底部 fold/expand 图标在 dev 模式丢失
 
-- **状态**: 🟡 in-progress (P2-6, devin/<unix>-P2-6-visitor-menu-footer-icon)
+- **状态**: ☑ done (PR #31, 2026-05-20),🟡 部分作废 (P2-7, 2026-05-20)
 - **Owns**:
   - `visitor/vite.config.ts`
   - `visitor/MIGRATION_TASKS.md`（仅本任务章节）
@@ -453,7 +453,28 @@
   - `npm run lint:eslint` 0 error（沿用 P2-3 基线）
   - `npm run build` 通过
 - **历史**:
-  - 2026-05-20 PR #TBD `visitor/vite.config.ts` 在 `optimizeDeps.exclude` 加入 `@zhqc-smart/{layout,table,settings,admin}`，恢复 dev 模式下左侧菜单底部折叠 / 展开图标渲染
+  - 2026-05-20 PR #31 `visitor/vite.config.ts` 在 `optimizeDeps.exclude` 加入 `@zhqc-smart/{layout,table,settings,admin}`
+  - 2026-05-20 P2-7 复盘：本任务修的 `optimizeDeps.exclude` 是必要但不充分条件。真正阻塞 fold / expand 图标显示的是 `server.fs.allow` 未放行 `../components` 目录，Vite 5 dev `fs.strict: true` 直接 403 拦截了图片。详见 P2-7。
+
+## P2-7. 修复 visitor 公共包静态资源被 Vite `server.fs.strict` 403 拦截
+
+- **状态**: 🟡 in-progress (P2-7, devin/<unix>-P2-7-visitor-menu-footer-icon-css)
+- **Owns**:
+  - `visitor/vite.config.ts`（仅 `server.fs.allow`）
+  - `visitor/MIGRATION_TASKS.md`（仅本任务章节 + P2-6 章节追加一行复盘历史）
+- **依赖**: P2-6（已先把公共包从 `optimizeDeps` 排除，使 `import.meta.url` 指回源码路径；本任务再补齐 fs 放行）
+- **背景**: P2-6 PR #31 合并后，本地复测仍然看不到左侧菜单底部折叠 / 展开图标。
+- **根因**: `@zhqc-smart/layout` 的 `breadcrumb.vue` 用 `new URL('../../asset/images/{fold,expand}.png', import.meta.url)` 引用图片，源文件在 `components/packages/layout/src/asset/images/`，**在 visitor 项目根目录之外**。Vite 5 dev server 默认 `server.fs.strict: true`，未列入 `server.fs.allow` 的目录会被直接 403 拦截。parking / access 子应用的 `vite.config.ts` 均显式配置:
+  ```ts
+  server.fs = { allow: [resolve(__dirname), resolve(__dirname, '../components')] };
+  ```
+  visitor 之前没配，于是 fold.png / expand.png 加载时 Vite 直接 403，导致菜单底部 `<img>` 加载失败、整张图片不显示。
+- **修复**: 在 `visitor/vite.config.ts` 的 `server` 块下新增 `fs.allow: [resolve(__dirname), resolve(__dirname, '../components')]`，与 parking / access 对齐。
+- **校验**:
+  - `npm run lint:eslint` 0 error（沿用 P2-3 基线）
+  - 本地 `npm run dev` 后菜单底部出现 fold / expand 图标，点击能切换菜单折叠态（用户本地验证）
+- **历史**:
+  - 2026-05-20 PR #TBD `visitor/vite.config.ts` 增补 `server.fs.allow = [resolve(__dirname), resolve(__dirname, '../components')]`，放行 Vite dev server 对外部 `components/` 目录的静态资源访问，恢复菜单底部折叠 / 展开图标
 
 ## P2-3. 最终 lint + build
 
