@@ -450,7 +450,7 @@
 
 ## P2-3. 最终 lint + build
 
-- **状态**: ☐ pending
+- **状态**: ☑ done (PR #TBD, 2026-05-20)
 - **Owns**: 视情况修复(每条修复独立 PR)
 - **依赖**: P2-1
 - **内容**:
@@ -459,6 +459,7 @@
   ```
   全部通过
 - **历史**:
+  - 2026-05-20 PR #TBD 修 ESLint v9 + ESM 不兼容(`.eslintrc.js` → `.eslintrc.cjs`、lint 脚本加 `cross-env ESLINT_USE_FLAT_CONFIG=false`),放宽 `no-console: warn` + `no-unused-vars` 接受 `_` 前缀豁免,批量修复 16 项 `no-unused-vars` error(stores/utils/qiankun/views/admin、views/permission、views/visitor 范围),最终 `npm run lint:eslint` 0 error / 27 warning(全为 `no-console`,Phase 2 决议为 warn 不阻塞),`npm run build` 通过。注:为避免和别人撞 PR,本任务作为 Phase 2 第一步先行;P2-1 i18n 收口仍待做,日后若 i18n PR 引入新的 lint 错误,再发独立修复 PR。
 
 ## P2-4. 截图/录屏
 

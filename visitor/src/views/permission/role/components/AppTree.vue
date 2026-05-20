@@ -20,7 +20,7 @@
 				@node-click="handleNodeClick"
 				class="custom-tree"
 			>
-				<template #default="{ node, data }">
+				<template #default="{ data }">
 					<div class="tree-node" :class="{ isLeaf: isLeaf(data) }">
 						<div class="node-content">
 							<div class="node-main">
@@ -58,7 +58,7 @@ interface Props {
 	treeData: AppTreeNode[];
 }
 
-const props = defineProps<Props>();
+defineProps<Props>();
 
 const emit = defineEmits<{
 	(e: 'node-click', data: AppTreeNode): void;

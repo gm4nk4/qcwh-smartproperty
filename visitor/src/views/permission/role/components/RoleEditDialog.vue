@@ -28,7 +28,7 @@
 
 import { ref, reactive, computed, watch } from 'vue';
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus';
-import type { RoleEditDialogProps, RoleEditDialogEmits, Role } from '../type';
+import type { RoleEditDialogProps, RoleEditDialogEmits } from '../type';
 
 const props = defineProps<RoleEditDialogProps>();
 const emit = defineEmits<RoleEditDialogEmits>();

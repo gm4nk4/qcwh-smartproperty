@@ -263,7 +263,7 @@ const handleSave = async () => {
 		emit('save', result);
 		ElMessage.success(isEdit.value ? '角色保存成功！' : '角色创建成功！');
 		handleClose();
-	} catch (error) {
+	} catch (_error) {
 		// 验证失败
 	}
 };

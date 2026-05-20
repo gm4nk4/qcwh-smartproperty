@@ -68,7 +68,7 @@ import type { Organization } from '../type';
 import { flattenOrganizations } from '../mock';
 import OrgTree from './OrgTree.vue';
 import OrgEditDialog from './OrgEditDialog.vue';
-import { ConfigurableTableWithForm, type QueryFormConfig, type TableColumn, type TableConfig, type Operation } from '@zhqc-smart/table';
+import { ConfigurableTableWithForm, type TableColumn, type TableConfig, type Operation } from '@zhqc-smart/table';
 
 interface Props {
 	organizations: Organization[];
@@ -154,7 +154,7 @@ const handleAddOrg = () => {
 	editDialogVisible.value = true;
 };
 
-const handleItemOrg = (data: Organization) => {
+const handleItemOrg = (_data: Organization) => {
 	editingOrgInfo.value = null;
 	editDialogVisible.value = true;
 };

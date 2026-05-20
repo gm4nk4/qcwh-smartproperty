@@ -71,7 +71,7 @@
 import { computed } from 'vue';
 import type { UserInfo, LoginLog } from '../type';
 
-const props = defineProps<{
+defineProps<{
 	userInfo: UserInfo;
 	loginLogs: LoginLog[];
 }>();

@@ -14,7 +14,7 @@ import {useMessage} from '/@/hooks/message';
 import * as CryptoJS from 'crypto-js';
 import {sm4} from 'sm-crypto'
 import {validateNull} from './validate';
-import {RouteItem, RouteItems, RouteToFrom} from '/@/types/global';
+import {RouteItem, RouteItems} from '/@/types/global';
 
 // 引入组件
 const SvgIcon = defineAsyncComponent(() => import('/@/components/SvgIcon/index.vue'));
@@ -42,7 +42,7 @@ export function useTitle() {
     nextTick(() => {
         let globalTitle: string = themeConfig.value.globalTitle;
         let webTitle = setMenuI18n(router.currentRoute.value);
-        document.title = `${webTitle} - ${globalTitle}` || globalTitle;
+        document.title = webTitle ? `${webTitle} - ${globalTitle}` : globalTitle;
     });
 }
 
@@ -105,7 +105,7 @@ export function deepClone(obj: EmptyObjectType) {
     let newObj: EmptyObjectType;
     try {
         newObj = obj.push ? [] : {};
-    } catch (error) {
+    } catch (_error) {
         newObj = {};
     }
     for (let attr in obj) {

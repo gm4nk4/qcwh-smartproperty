@@ -46,7 +46,7 @@ interface Props {
 	appName?: string;
 }
 
-const props = withDefaults(defineProps<Props>(), {
+withDefaults(defineProps<Props>(), {
 	organizations: () => [],
 	selectedNodeId: 1,
 	showHeader: true,

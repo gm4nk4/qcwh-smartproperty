@@ -106,7 +106,7 @@ const dialogVisible = ref(false);
 const authDialogVisible = ref(false);
 const editDialogVisible = ref(false);
 const resetPwdDialogVisible = ref(false);
-const { userInfos, themeConfig } = useThemeOrUserInfo();
+const { userInfos } = useThemeOrUserInfo();
 
 const tableData = ref<User[]>(mockUsers);
 const stats = ref(mockStats);
@@ -152,7 +152,7 @@ const tableColumns: TableColumn[] = [
 		fixed: 'right',
 		align: 'center',
 		buttonSize: 'small',
-		operations: (row: any): Operation[] => {
+		operations: (_row: any): Operation[] => {
 			const ops: Operation[] = [
 				{ label: '编辑', action: 'edit', type: 'primary', link: true },
 				{ label: '详情', action: 'detail', type: 'info', link: true },

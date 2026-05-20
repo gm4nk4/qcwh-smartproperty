@@ -186,7 +186,7 @@ const checkAll = () => {
 };
 
 // 初始化编辑模式下的选中权限
-const initCheckedPermissions = (roleInfo: any) => {
+const initCheckedPermissions = (_roleInfo: any) => {
 	// 这里可以根据实际情况从 roleInfo 中获取已分配的权限
 	// 目前先选中前几个演示
 	const demoKeys = [

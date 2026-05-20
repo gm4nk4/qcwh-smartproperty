@@ -24,7 +24,6 @@
  */
 import { ref, computed } from 'vue';
 import { ElMessage } from 'element-plus';
-import { Close } from '@element-plus/icons-vue';
 import type { UserDetailDialogProps, UserDetailDialogEmits, UserInfo, LoginLog, PlatformRole, SubAppPermission } from './type';
 import { mockUserInfo, mockLoginLogs, mockPlatformRoles, mockSubAppPermissions } from './mock';
 import UserInfoPanel from './components/UserInfoPanel.vue';

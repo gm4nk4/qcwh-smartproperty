@@ -186,7 +186,7 @@ const handleEditOrg = (data: Organization) => {
 /**
  * 删除组织
  */
-const handleDelete = (data: Organization) => {
+const handleDelete = (_data: Organization) => {
 	editingOrgInfo.value = null;
 	editDialogVisible.value = false;
 };
@@ -194,7 +194,7 @@ const handleDelete = (data: Organization) => {
 /**
  * 添加子部门
  */
-const handleAddSubSpace = (data: Organization) => {
+const handleAddSubSpace = (_data: Organization) => {
 	editingOrgInfo.value = null;
 	editDialogVisible.value = false;
 };
