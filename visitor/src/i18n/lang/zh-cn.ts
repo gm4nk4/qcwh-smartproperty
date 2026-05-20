@@ -183,4 +183,12 @@ export default {
 		btnTwo: '马上更新',
 		btnTwoLoading: '更新中',
 	},
+	// page.* 由 P2-1 从 visitor/src/views/login/i18n/zh-cn.ts 收口而来（access 登录页对齐用）
+	page: {
+		welcome: '欢迎登录',
+		subtitle: '请输入账号和密码',
+		username: '用户名',
+		password: '密码',
+		imageCode: '图片验证码',
+	},
 };

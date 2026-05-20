@@ -423,7 +423,7 @@
 
 ## P2-1. i18n 统一收口
 
-- **状态**: ☐ pending
+- **状态**: ☑ done (PR #TBD, 2026-05-20)
 - **Owns**:
   - `visitor/src/i18n/lang/zh-cn.ts`、`visitor/src/i18n/lang/en.ts`
   - `visitor/src/i18n/index.ts`、`visitor/src/i18n/pages/**`
@@ -431,6 +431,10 @@
 - **依赖**: 用户指派的 Phase 1 任务全部 done
 - **内容**: 把 Phase 1 各模块独立 i18n 文件合并到 `i18n/lang/*.ts`(或 `i18n/pages/*` 子模块),配置 vue-i18n 加载
 - **历史**:
+  - 2026-05-20 PR #TBD 盘点 Phase 1 新增的模块内 i18n 文件:
+    - D5(PR #18)新增 `visitor/src/views/login/i18n/{zh-cn,en}.ts`(`page.welcome / subtitle / username / password / imageCode`)
+    - C11(PR #22)新增 `visitor/src/views/set/menu/i18n/{zh-cn,en}.ts`(`sysmenu` 命名空间;与既有 `visitor/src/views/admin/menu/i18n/{zh-cn,en}.ts` **逐字节相同**,纯重复)。
+    把 D5 的 `page.*` 5 个键合并到 `visitor/src/i18n/lang/{zh-cn,en}.ts` 末尾(挨着 `upgrade` 命名空间下面),删除 `views/login/i18n/`;删除 `views/set/menu/i18n/`(`sysmenu` 命名空间由既有 `admin/menu/i18n/` 提供,运行时 glob 已覆盖)。其他模块的 i18n 文件均为项目初始化即存在(`views/admin/{client,dept,dict,file,log,menu,param,post,role,token,user}/i18n/`、`views/home/i18n/`、`components/{QueryTree,Upload}/i18n/`),不属于 Phase 1 新增,保留不动以缩小本任务变更面。`i18n/index.ts` 的 `import.meta.glob('./../../**/**/**/i18n/*.ts')` 继续按现状自动加载。**校验**:`npm run dev` HTTP 200;`/#/login` 仍正确显示「欢迎登录 / 请输入账号和密码 / 用户名 / 密码 / 图片验证码」(改走 `i18n/lang/zh-cn.ts` 而不是 `views/login/i18n/zh-cn.ts`)。`npm run lint:eslint` 0 error / 27 warning(沿用 P2-3 基线)。`npm run build` 通过。
 
 ## P2-2. main-app 联调
 
