@@ -372,22 +372,13 @@
 
 ### C11. 系统设置 — 菜单管理
 
-- **状态**: ☐ pending
-- **Owns**: `visitor/src/views/set/menu/**`（新增）、`visitor/src/router/route.ts` 加一行 `/set/menu`
-- **依赖**: P0-5, C0
-- ⚠️ 本任务**例外**地需要改 `route.ts`（加一行 `/set/menu` 路由，P0-5 未占位），同 D4 例外。为避免与其他 PR 撞期，**由父会话集中处理**，不拆子会话。
-- **内容**: 从 `access/src/views/set/menu/` 复制整套到 `visitor/src/views/set/menu/`（包括 `index.vue` 以及 `mock.ts` / `type.ts` / `components/` 等存在的文件），保留 mock、不接后端。同时在 `visitor/src/router/route.ts` 的 `dynamicRoutes` 中追加一条 `/set/menu` 路由。
-- **历史**:
-
-### C11. 系统设置 — 菜单管理
-
-- **状态**: ☑ done (PR #TBD, 2026-05-20)
+- **状态**: ☑ done (PR #22, 2026-05-20)
 - **Owns**: `visitor/src/views/set/menu/**`(新增)、`visitor/src/router/route.ts` 加一行 `/set/menu`
 - **依赖**: P0-5, C0
 - ⚠️ 本任务**例外**地需要改 `route.ts`(加一行 `/set/menu` 路由,P0-5 未占位),同 D4 例外。为避免与其他 PR 撞期,**由父会话集中处理**,不拆子会话。
 - **内容**: 从 `access/src/views/set/menu/` 复制整套到 `visitor/src/views/set/menu/`(包括 `index.vue` 以及 `mock.ts` / `type.ts` / `components/` 等存在的文件),保留 mock、不接后端。同时在 `visitor/src/router/route.ts` 的 `dynamicRoutes` 中追加一条 `/set/menu` 路由。
 - **历史**:
-  - 2026-05-20 PR #TBD 从 `access/src/views/set/menu/` 复制 `index.vue`、`form.vue`、`i18n/{zh-cn,en}.ts` 到 `visitor/src/views/set/menu/` 同名路径(diff 无差异)。所有 import 均为 `/@/api/admin/menu`、`/@/hooks/{table,message}`、`/@/utils/validate`、`/@/components/IconSelector`(visitor 全部已有相同实现);未引入新依赖。同时在 `visitor/src/router/route.ts` 的 `dynamicRoutes` 末尾追加 `/set/menu` 路由(icon `ele-Operation`,title 「菜单管理」,enName 「Menu Management」);此为冻结后 route.ts 的例外修改,同 D4 例外性质,已在 MIGRATION_TASKS 第 3 节冻结清单内默认豁免
+  - 2026-05-20 PR #22 从 `access/src/views/set/menu/` 复制 `index.vue`、`form.vue`、`i18n/{zh-cn,en}.ts` 到 `visitor/src/views/set/menu/` 同名路径(diff 无差异)。所有 import 均为 `/@/api/admin/menu`、`/@/hooks/{table,message}`、`/@/utils/validate`、`/@/components/IconSelector`(visitor 全部已有相同实现);未引入新依赖。同时在 `visitor/src/router/route.ts` 的 `dynamicRoutes` 末尾追加 `/set/menu` 路由(icon `ele-Operation`,title 「菜单管理」,enName 「Menu Management」);此为冻结后 route.ts 的例外修改,同 D4 例外性质,已在 MIGRATION_TASKS 第 3 节冻结清单内默认豁免
 
 ### C0. 共享 hook(`useThemeOrUserInfo`) — Track C 公共前置
 
@@ -411,11 +402,12 @@
 
 ### D4. 主题图片库
 
-- **状态**: ☐ pending
+- **状态**: ☑ done (PR #TBD, 2026-05-20)
 - **Owns**: `visitor/src/views/theme-images/**`(新增)、`visitor/src/router/route.ts` 加一行
 - **依赖**: P0-4
 - ⚠️ 本任务**例外**地需要改 `route.ts`(加一行 `/theme-images`),开 PR 前请先通知用户、避免和其他 PR 撞期。如果用户接受,可以一并放进 P0-5 一起做(更稳)
 - **历史**:
+  - 2026-05-20 PR #TBD 从 `access/src/views/theme-images/index.vue`(627 行)1:1 复制到 `visitor/src/views/theme-images/index.vue`(prettier 格式化,无逻辑差异)。所有 import 均为 `/@/stores/themeConfig`、`/@/utils/{commonFunction,themeImages,themeSkin}`,visitor 已全部具备(P0-4 已落地)。同时在 `visitor/src/router/route.ts` 的 `dynamicRoutes` 末尾追加 `/theme-images` 路由(icon `ele-Picture`,title 「主题图片库」,enName 「Theme Asset Library」);此为冻结后 route.ts 的例外修改,与 C11 例外同型,父会话集中处理。同 PR 顺手清理 MIGRATION_TASKS.md 中的 C11 重复章节(原 PR #21 留下 pending 副本 + PR #22 增补 done 副本未合并,本 PR 合二为一并把 PR # 从 #TBD 回填为 #22)。
 
 ### D5. 登录页对齐
 

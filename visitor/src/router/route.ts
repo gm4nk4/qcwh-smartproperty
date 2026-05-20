@@ -290,6 +290,22 @@ export const dynamicRoutes: Array<RouteRecordRaw> = [
 			icon: 'ele-Operation',
 		},
 	},
+	// D4 例外:主题图片库 — P0-5 未占位,本任务加一行路由
+	{
+		path: '/theme-images',
+		name: 'theme.images',
+		component: () => import('/@/views/theme-images/index.vue'),
+		meta: {
+			title: '主题图片库',
+			enName: 'Theme Asset Library',
+			isLink: '',
+			isHide: false,
+			isKeepAlive: false,
+			isAffix: false,
+			isIframe: false,
+			icon: 'ele-Picture',
+		},
+	},
 ];
 
 /**
