@@ -461,6 +461,38 @@
   - 2026-05-20 PR #31 `visitor/vite.config.ts` 在 `optimizeDeps.exclude` 加入 `@zhqc-smart/{layout,table,settings,admin}`（dev 模式首轮修复，未生效）
   - 2026-05-20 PR #TBD `visitor/vite.config.ts` 在 `server.fs.allow` 放行 `../components`，与 access / parking 对齐，恢复 dev 模式下左侧菜单底部折叠 / 展开图标渲染
 
+## P2-7. 修复 qiankun 主应用下「设置」分组 4 项页面 404
+
+- **状态**: 🟡 in-progress (P2-7, devin/<unix>-P2-7-visitor-settings-routes-qiankun-prefix)
+- **Owns**:
+  - `visitor/src/router/route.ts`（4 项设置路由 + 父级分组 + 隐藏 personal 路由补齐 `/visitor/` 前缀）
+  - `visitor/MIGRATION_TASKS.md`（仅本任务章节）
+- **依赖**: P2-5（「设置」父级分组在 PR #30 引入）
+- **背景**: 用户在 main-app 主应用下（qiankun 模式）访问 visitor 时，点击「设置」分组下「用户管理 / 角色管理 / 组织管理 / 菜单管理」4 项菜单都跳到 404，独立运行 visitor 时无此问题。访客其余 6 个顶级页面（访客总览 / 预约记录 / 通行记录 / 黑名单管理 / 访客配置 / 园区访客管理说明）正常。
+- **根因**: main-app 与 visitor 都使用 `createWebHashHistory`，**全局只有一个 hash**。`main-app/src/micro/index.ts` 注册 qiankun activeRule 读取 `location.hash` 前缀判断子应用是否激活：路径必须 `=== app.routePath` 或 `startsWith(app.routePath + '/')`，对 visitor 即必须以 `/visitor` 起始。`main-app/src/config/apps.ts` 也声明 `routePath: '/visitor'`。
+
+  P2-5 把「设置」4 条路由 path 写成 `/permission/user`、`/permission/role`、`/permission/organization`、`/set/menu`（无 `/visitor/` 前缀）。在 qiankun 下点击这些菜单时，visitor 的 hash router push 把全局 `location.hash` 直接覆写为 `#/permission/user` 等，**主应用 activeRule 不再匹配** → qiankun 卸载 visitor → 主应用 `Home.vue` 的 qiankun 容器对应路由 `/:routePath/:subpath(.*)*` 也不命中 → 落入 catch-all 404。访客其余 6 条 path 都已是 `/visitor/...`，所以一直正常。
+- **修复**: 仅业务路由配置改动，不动 vue-router / qiankun 基础设施：
+  - `userRoute.path`: `/permission/user` → `/visitor/permission/user`
+  - `roleRoute.path`: `/permission/role` → `/visitor/permission/role`
+  - `organizationRoute.path`: `/permission/organization` → `/visitor/permission/organization`
+  - `menuRoute.path`: `/set/menu` → `/visitor/set/menu`
+  - `menuRoutes` 父级 `set` 的 `path`: `/set` → `/visitor/set`（el-sub-menu 的 `:index` 标识，保持与其它顶级菜单同前缀以便 hash 一致）
+  - `personalRoute.path`: `/personal` → `/visitor/personal`（隐藏路由，预防同样的踩坑）
+
+  路由 `name` 全部保留不动，以避免 tagsView / keep-alive / `defaultActive` 等其它引用受影响。
+- **不采用 access 那套 `createMemoryHistory` + `syncSubAppRoute` 方案的原因**:
+  - 该方案需要同时改 `visitor/src/router/index.ts`（基础设施）+ 新增 `VITE_QIANKUN_NAME=visitor`（env 配置），与「只改业务代码」边界冲突；
+  - 而且 visitor 现有 6 条访客业务路由 path 已经携带 `/visitor/` 前缀，配合 `syncSubAppRoute` 会出现 `/#/visitor/visitor/overview` 双前缀，反而需要再回头去掉这些前缀（牵动 7 个顶级菜单），不属于本次定向 bug 修复范围。
+
+  当前方案保持「visitor 所有 path 均以 `/visitor/` 起始」的一致性，主应用 activeRule 始终命中，最小化变更面。
+- **校验**（本机由用户跑，VM 不跑 build / install）:
+  - 在 main-app（qiankun 主应用）下进入 visitor 「设置」分组，依次打开「用户管理 / 角色管理 / 组织管理 / 菜单管理」均正确渲染对应视图，不再跳 404
+  - 访客其余 6 项顶级菜单不受影响
+  - `npm run lint:eslint` 0 error（沿用 P2-3 基线）
+- **历史**:
+  - 2026-05-20 PR #TBD `visitor/src/router/route.ts` 4 项设置路由 + `set` 父级分组 + 隐藏 personal 路由统一补齐 `/visitor/` 前缀，修复 qiankun 主应用下点击「设置」子项跳 404
+
 ## P2-3. 最终 lint + build
 
 - **状态**: ☑ done (PR #TBD, 2026-05-20)
