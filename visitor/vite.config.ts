@@ -76,6 +76,14 @@ const viteConfig = defineConfig((mode: ConfigEnv) => {
 				},
 			},
 			allowedHosts: ['localhost', '127.0.0.1', '.ngrok-free.app'],
+			// `@zhqc-smart/*` 公共包通过 `file:../components/packages/*` 软链引入,Vite 默认 `preserveSymlinks: false` 会
+			// 把 `node_modules/@zhqc-smart/layout/**` 解析到 `components/packages/layout/**` 真实路径(位于 visitor 项目根之外)。
+			// Vite 5 默认 `server.fs.strict = true`,根外文件会被 dev 服务器拦截 → `fold.png` / `expand.png` 等通过
+			// `new URL('../../asset/images/*.png', import.meta.url)` 引用的资源在 dev 模式下 403/404,
+			// 表现为左侧菜单底部折叠/展开图标不可见。与 access / parking 子应用一致,显式放行 `../components`。
+			fs: {
+				allow: [resolve(__dirname), resolve(__dirname, '../components')],
+			},
 		},
 		build: {
 			outDir: 'dist',
