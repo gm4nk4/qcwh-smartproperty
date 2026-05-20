@@ -27,14 +27,14 @@ declare module 'vue-router' {
 		isIframe?: boolean;
 		roles?: string[];
 		icon?: string;
+		enName?: string;
 	}
 }
 
-/**
- * 定义静态路由（默认路由）
- * 前端添加路由，请在此处加
- */
-export const dynamicRoutes: Array<RouteRecordRaw> = [
+// ---------------------------------------------------------------------------
+// visitor 业务路由：访客总览 / 预约记录 / 通行记录 / 黑名单管理 / 访客配置 / 园区访客管理说明
+// ---------------------------------------------------------------------------
+const visitorRoutes: Array<RouteRecordRaw> = [
 	{
 		path: '/visitor/overview',
 		name: 'visitor.overview',
@@ -125,186 +125,124 @@ export const dynamicRoutes: Array<RouteRecordRaw> = [
 			icon: 'ele-Document',
 		},
 	},
-	{
-		path: '/personal',
-		name: 'router.personal',
-		component: () => import('/@/views/admin/user/personal.vue'),
-		meta: {
-			isHide: true,
-		},
+];
+
+// ---------------------------------------------------------------------------
+// 设置（系统设置）路由：用户管理 / 角色管理 / 组织管理 / 菜单管理
+// menuRoutes 中会以「设置」为父菜单把这 4 条合并展示，
+// dynamicRoutes 中保持扁平以避免 vue-router 嵌套注册。
+// ---------------------------------------------------------------------------
+const userRoute: RouteRecordRaw = {
+	path: '/permission/user',
+	name: 'permission.user',
+	component: () => import('/@/views/permission/user/index.vue'),
+	meta: {
+		title: '用户管理',
+		enName: 'User Management',
+		isLink: '',
+		isHide: false,
+		isKeepAlive: false,
+		isAffix: false,
+		isIframe: false,
+		icon: 'ele-User',
 	},
-	// ---------------------------------------------------------------------------
-	// Phase 0 / P0-5: 一次性占位路由(permission/* 与 portal/*)。
-	// 每条路由的 `component` 指向自己模块下的 `index.vue` 文件;Phase 0 阶段这些
-	// 文件只是 `_placeholder/index.vue` 的 re-export 占位,Phase 1 的 Track C
-	// 各任务把真实页面写到对应目录,不再需要改本文件(`route.ts` Phase 0 后冻结)。
-	// ---------------------------------------------------------------------------
+};
+
+const roleRoute: RouteRecordRaw = {
+	path: '/permission/role',
+	name: 'permission.role',
+	component: () => import('/@/views/permission/role/index.vue'),
+	meta: {
+		title: '角色管理',
+		enName: 'Role Management',
+		isLink: '',
+		isHide: false,
+		isKeepAlive: false,
+		isAffix: false,
+		isIframe: false,
+		icon: 'ele-UserFilled',
+	},
+};
+
+const organizationRoute: RouteRecordRaw = {
+	path: '/permission/organization',
+	name: 'permission.organization',
+	component: () => import('/@/views/permission/organization/index.vue'),
+	meta: {
+		title: '组织管理',
+		enName: 'Organization Management',
+		isLink: '',
+		isHide: false,
+		isKeepAlive: false,
+		isAffix: false,
+		isIframe: false,
+		icon: 'ele-Coordinate',
+	},
+};
+
+const menuRoute: RouteRecordRaw = {
+	path: '/set/menu',
+	name: 'set.menu',
+	component: () => import('/@/views/set/menu/index.vue'),
+	meta: {
+		title: '菜单管理',
+		enName: 'Menu Management',
+		isLink: '',
+		isHide: false,
+		isKeepAlive: false,
+		isAffix: false,
+		isIframe: false,
+		icon: 'ele-Operation',
+	},
+};
+
+const settingsRoutes: Array<RouteRecordRaw> = [userRoute, roleRoute, organizationRoute, menuRoute];
+
+// 个人中心（隐藏）
+const personalRoute: RouteRecordRaw = {
+	path: '/personal',
+	name: 'router.personal',
+	component: () => import('/@/views/admin/user/personal.vue'),
+	meta: {
+		isHide: true,
+	},
+};
+
+/**
+ * 定义静态路由（默认路由）
+ * vue-router 实际注册的路由集合，**保持扁平**。
+ * 「设置」父节点仅用于左侧菜单分组（见 menuRoutes），不在此处生成 vue-router 路由。
+ */
+export const dynamicRoutes: Array<RouteRecordRaw> = [
+	...visitorRoutes,
+	...settingsRoutes,
+	personalRoute,
+];
+
+/**
+ * 左侧菜单结构（含「设置」父级分组）
+ * - 顶层项：访客总览 / 预约记录 / 通行记录 / 黑名单管理 / 访客配置 / 园区访客管理说明
+ * - 「设置」父级 children：用户管理 / 角色管理 / 组织管理 / 菜单管理
+ *
+ * 注意：此处的子项与 dynamicRoutes 是同一个对象引用，meta/icon/path 完全一致，
+ * 仅为菜单渲染（aside.vue → vertical.vue → SubItem）提供分组结构。
+ */
+export const menuRoutes: Array<RouteRecordRaw> = [
+	...visitorRoutes,
 	{
-		path: '/permission/user',
-		name: 'permission.user',
-		component: () => import('/@/views/permission/user/index.vue'),
+		path: '/set',
+		name: 'set',
 		meta: {
-			title: '用户管理',
-			enName: 'User Management',
+			title: '设置',
+			enName: 'Settings',
 			isLink: '',
 			isHide: false,
 			isKeepAlive: false,
 			isAffix: false,
 			isIframe: false,
-			icon: 'ele-User',
+			icon: 'ele-Tools',
 		},
-	},
-	{
-		path: '/permission/role',
-		name: 'permission.role',
-		component: () => import('/@/views/permission/role/index.vue'),
-		meta: {
-			title: '角色管理',
-			enName: 'Role Management',
-			isLink: '',
-			isHide: false,
-			isKeepAlive: false,
-			isAffix: false,
-			isIframe: false,
-			icon: 'ele-UserFilled',
-		},
-	},
-	{
-		path: '/permission/position',
-		name: 'permission.position',
-		component: () => import('/@/views/permission/position/index.vue'),
-		meta: {
-			title: '岗位管理',
-			enName: 'Position Management',
-			isLink: '',
-			isHide: false,
-			isKeepAlive: false,
-			isAffix: false,
-			isIframe: false,
-			icon: 'ele-Postcard',
-		},
-	},
-	{
-		path: '/permission/space',
-		name: 'permission.space',
-		component: () => import('/@/views/permission/space/index.vue'),
-		meta: {
-			title: '空间管理',
-			enName: 'Space Management',
-			isLink: '',
-			isHide: false,
-			isKeepAlive: false,
-			isAffix: false,
-			isIframe: false,
-			icon: 'ele-OfficeBuilding',
-		},
-	},
-	{
-		path: '/permission/organization',
-		name: 'permission.organization',
-		component: () => import('/@/views/permission/organization/index.vue'),
-		meta: {
-			title: '组织管理',
-			enName: 'Organization Management',
-			isLink: '',
-			isHide: false,
-			isKeepAlive: false,
-			isAffix: false,
-			isIframe: false,
-			icon: 'ele-Coordinate',
-		},
-	},
-	{
-		path: '/portal/application',
-		name: 'portal.application',
-		component: () => import('/@/views/portal/application/index.vue'),
-		meta: {
-			title: '子应用管理',
-			enName: 'Application Management',
-			isLink: '',
-			isHide: false,
-			isKeepAlive: false,
-			isAffix: false,
-			isIframe: false,
-			icon: 'ele-Menu',
-		},
-	},
-	{
-		path: '/portal/ai',
-		name: 'portal.ai',
-		component: () => import('/@/views/portal/ai/index.vue'),
-		meta: {
-			title: 'AI 工具中心',
-			enName: 'AI Tools',
-			isLink: '',
-			isHide: false,
-			isKeepAlive: false,
-			isAffix: false,
-			isIframe: false,
-			icon: 'ele-MagicStick',
-		},
-	},
-	{
-		path: '/portal/category',
-		name: 'portal.category',
-		component: () => import('/@/views/portal/category/index.vue'),
-		meta: {
-			title: '应用分类',
-			enName: 'Application Category',
-			isLink: '',
-			isHide: false,
-			isKeepAlive: false,
-			isAffix: false,
-			isIframe: false,
-			icon: 'ele-Files',
-		},
-	},
-	{
-		path: '/portal/workbench',
-		name: 'portal.workbench',
-		component: () => import('/@/views/portal/workbench/index.vue'),
-		meta: {
-			title: '工作台配置',
-			enName: 'Workbench Configuration',
-			isLink: '',
-			isHide: false,
-			isKeepAlive: false,
-			isAffix: false,
-			isIframe: false,
-			icon: 'ele-Suitcase',
-		},
-	},
-	// C11 例外:菜单管理(系统设置)— P0-5 未占位,本任务加一行路由
-	{
-		path: '/set/menu',
-		name: 'set.menu',
-		component: () => import('/@/views/set/menu/index.vue'),
-		meta: {
-			title: '菜单管理',
-			enName: 'Menu Management',
-			isLink: '',
-			isHide: false,
-			isKeepAlive: false,
-			isAffix: false,
-			isIframe: false,
-			icon: 'ele-Operation',
-		},
-	},
-	// D4 例外:主题图片库 — P0-5 未占位,本任务加一行路由
-	{
-		path: '/theme-images',
-		name: 'theme.images',
-		component: () => import('/@/views/theme-images/index.vue'),
-		meta: {
-			title: '主题图片库',
-			enName: 'Theme Asset Library',
-			isLink: '',
-			isHide: false,
-			isKeepAlive: false,
-			isAffix: false,
-			isIframe: false,
-			icon: 'ele-Picture',
-		},
+		children: settingsRoutes,
 	},
 ];
 
