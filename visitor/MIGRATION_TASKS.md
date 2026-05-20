@@ -328,11 +328,12 @@
 
 ### C6. 组织管理
 
-- **状态**: ☐ pending
+- **状态**: ☑ done (PR #TBD, 2026-05-20)
 - **Owns**: `visitor/src/views/permission/organization/**`
 - **依赖**: P0-5, C0
 - **内容**: 包含 `UnifiedOrgView.vue`
 - **历史**:
+  - 2026-05-20 PR #TBD 从 access 复制 permission/organization 全套(index.vue / mock.ts / type.ts / components/{UnifiedOrgView,IndependentOrgView,OrgTree,OrgEditDialog}.vue),覆盖 P0-5 占位,prettier 格式化
 
 ### C7. 统一门户 — 子应用管理
 
