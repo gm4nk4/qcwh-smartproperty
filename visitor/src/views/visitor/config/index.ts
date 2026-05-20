@@ -1,3 +1,4 @@
+import type { TableColumn } from '@zhqc-smart/table';
 import type { VisitorConfigPassMethod, VisitorConfigValidityType } from './api';
 
 export interface VisitorConfigFormData {
@@ -12,15 +13,6 @@ export interface DeviceDialogFormData {
 }
 
 export type VisitorConfigEditableField = Exclude<keyof VisitorConfigFormData, 'passMethods'>;
-
-export interface DeviceTableColumnConfig {
-	key: string;
-	prop: string;
-	label: string;
-	minWidth?: number;
-	width?: number;
-	type?: 'index' | 'deviceType' | 'operation';
-}
 
 export interface ValidityExtraFieldConfig {
 	key: string;
@@ -51,12 +43,19 @@ export interface DeviceDialogFieldConfig {
 	props: Record<string, unknown>;
 }
 
-export const deviceTableColumnConfigs: DeviceTableColumnConfig[] = [
-	{ key: 'seq', prop: 'seq', label: '序号', width: 80, type: 'index' },
-	{ key: 'deviceName', prop: 'deviceName', label: '设备名称', minWidth: 220 },
-	{ key: 'deviceTypeLabel', prop: 'deviceTypeLabel', label: '设备类型', minWidth: 160, type: 'deviceType' },
-	{ key: 'deviceLocation', prop: 'deviceLocation', label: '设备位置', minWidth: 220 },
-	{ key: 'operation', prop: 'operation', label: '操作', width: 100, type: 'operation' },
+export const deviceTableColumns: TableColumn[] = [
+	{ prop: 'deviceName', label: '设备名称', minWidth: 220, align: 'center' },
+	{ prop: 'deviceTypeLabel', label: '设备类型', minWidth: 160, align: 'center' },
+	{ prop: 'deviceLocation', label: '设备位置', minWidth: 220, align: 'center' },
+	{
+		prop: 'operation',
+		label: '操作',
+		type: 'operation',
+		width: 100,
+		fixed: 'right',
+		align: 'center',
+		operations: [{ label: '移除', action: 'remove', type: 'primary', link: true }],
+	},
 ];
 
 export const validityOptionConfigs: ValidityOptionConfig[] = [

@@ -16,23 +16,7 @@
 					</el-button>
 				</header>
 
-				<el-table :data="deviceTableRows" class="visitor-config__table" row-key="id">
-					<el-table-column
-						v-for="column in deviceTableColumnConfigs"
-						:key="column.key"
-						:prop="column.prop"
-						:label="column.label"
-						:min-width="column.minWidth"
-						:width="column.width"
-					>
-						<template #default="{ row }">
-							<span v-if="column.type === 'index'">{{ row.seq }}</span>
-							<span v-else-if="column.type === 'deviceType'">{{ row.deviceTypeLabel }}</span>
-							<el-button v-else-if="column.type === 'operation'" type="primary" link @click="handleRemoveDevice(row.id)">移除</el-button>
-							<span v-else>{{ row[column.prop] }}</span>
-						</template>
-					</el-table-column>
-				</el-table>
+				<ConfigurableTable class="visitor-config__table" :config="deviceTableConfig" @operation="handleDeviceTableOperation" />
 
 				<div class="visitor-config__panel-note">所有设备均在设备管理子系统中进行管理。</div>
 			</section>
@@ -155,6 +139,7 @@
 <script setup lang="ts" name="visitorConfig">
 import { computed, onMounted, reactive } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
+import { ConfigurableTable, type TableConfig } from '@zhqc-smart/table';
 import {
 	addVisitorConfigDevice,
 	getVisitorConfigDetail,
@@ -169,7 +154,7 @@ import {
 	defaultDeviceDialogFormData,
 	defaultFormData,
 	deviceDialogFieldConfigs,
-	deviceTableColumnConfigs,
+	deviceTableColumns,
 	passMethodConfigs,
 	validityOptionConfigs,
 	type DeviceDialogFormData,
@@ -206,6 +191,15 @@ const dialogState = reactive({
 });
 
 const deviceTableRows = computed(() => buildVisitorConfigDeviceRows(pageState.deviceRecords));
+
+const deviceTableConfig = computed<TableConfig>(() => ({
+	columns: deviceTableColumns,
+	data: deviceTableRows.value,
+	selectionType: 'none',
+	showIndex: true,
+	showOperations: true,
+	pagination: false,
+}));
 
 const deviceDialogOptions = computed(() => buildVisitorConfigDeviceOptions(pageState.deviceOptions, pageState.deviceRecords));
 
@@ -281,6 +275,12 @@ const handleSubmitDeviceDialog = async () => {
 		await loadPageData();
 	} finally {
 		dialogState.submitting = false;
+	}
+};
+
+const handleDeviceTableOperation = ({ action, row }: { action: string; row: VisitorConfigDeviceItem }) => {
+	if (action === 'remove') {
+		handleRemoveDevice(row.id);
 	}
 };
 
@@ -390,9 +390,21 @@ onMounted(() => {
 	}
 
 	&__table {
-		:deep(th.el-table__cell) {
-			background: #f8fafc;
-			color: #64748b;
+		:deep(.configurable-table-container) {
+			height: auto;
+		}
+
+		:deep(.table-content) {
+			overflow: visible;
+		}
+
+		:deep(.el-table) {
+			height: auto !important;
+		}
+
+		:deep(.el-table th.el-table__cell) {
+			background: #f8fafc !important;
+			color: #64748b !important;
 			font-weight: 600;
 		}
 	}
