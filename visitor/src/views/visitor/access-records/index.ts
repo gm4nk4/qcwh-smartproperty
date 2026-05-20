@@ -1,3 +1,4 @@
+import type { QueryFormConfig, TableColumn } from '@zhqc-smart/table';
 import type { VisitorAccessStatus } from './api';
 
 export interface AccessRecordFormData {
@@ -15,30 +16,6 @@ export interface AccessRecordFormData {
 }
 
 export type AccessRecordQueryField = keyof Omit<AccessRecordFormData, 'current' | 'size'>;
-
-export interface QueryFieldOption {
-	label: string;
-	value: string;
-}
-
-export interface QueryFieldConfig {
-	key: string;
-	field: AccessRecordQueryField;
-	label: string;
-	component: 'el-input' | 'el-select';
-	props: Record<string, unknown>;
-	options?: QueryFieldOption[];
-}
-
-export interface AccessRecordTableColumnConfig {
-	key: string;
-	prop: string;
-	label: string;
-	minWidth?: number;
-	width?: number;
-	type?: 'index' | 'status' | 'operation' | 'preview';
-	fixed?: 'left' | 'right';
-}
 
 export interface DetailFieldConfig {
 	label: string;
@@ -61,129 +38,79 @@ export interface PassRecordColumnConfig {
 	type?: 'preview';
 }
 
-export const passTypeOptions: QueryFieldOption[] = [
-	{ label: '全部', value: '' },
+export const passTypeOptions = [
 	{ label: '入', value: 'enter' },
 	{ label: '出', value: 'exit' },
 ];
 
-export const passMethodOptions: QueryFieldOption[] = [
-	{ label: '全部', value: '' },
+export const passMethodOptions = [
 	{ label: '车辆通行', value: 'vehicle' },
 	{ label: '行人扫码', value: 'person_scan' },
 ];
 
-export const queryFieldConfigs: QueryFieldConfig[] = [
-	{
-		key: 'visitorName',
-		field: 'visitorName',
-		label: '访客姓名',
-		component: 'el-input',
-		props: {
-			placeholder: '请输入',
-			clearable: true,
-		},
+export const queryFormConfig: QueryFormConfig = {
+	fields: [
+		{ label: '访客姓名', value: 'visitorName', type: 'text', selected: true },
+		{ label: '访客手机号', value: 'visitorPhone', type: 'text', selected: true },
+		{ label: '车牌号', value: 'licensePlate', type: 'text', selected: true },
+		{ label: '被访人企业', value: 'visitedEnterprise', type: 'text', selected: true },
+		{ label: '被访人姓名', value: 'visitedName', type: 'text', selected: true },
+		{ label: '通行类型', value: 'passType', type: 'select', selected: true },
+		{ label: '通行方式', value: 'passMethod', type: 'select', selected: true },
+		{ label: '访客单号', value: 'appointmentNo', type: 'text', selected: true },
+		{ label: '通行位置', value: 'passLocation', type: 'text', selected: true },
+	],
+	fieldOptions: {
+		passType: passTypeOptions,
+		passMethod: passMethodOptions,
 	},
-	{
-		key: 'visitorPhone',
-		field: 'visitorPhone',
-		label: '访客手机号',
-		component: 'el-input',
-		props: {
-			placeholder: '请输入',
-			clearable: true,
-		},
-	},
-	{
-		key: 'licensePlate',
-		field: 'licensePlate',
-		label: '车牌号',
-		component: 'el-input',
-		props: {
-			placeholder: '请输入',
-			clearable: true,
-		},
-	},
-	{
-		key: 'visitedEnterprise',
-		field: 'visitedEnterprise',
-		label: '被访人企业',
-		component: 'el-input',
-		props: {
-			placeholder: '请输入',
-			clearable: true,
-		},
-	},
-	{
-		key: 'visitedName',
-		field: 'visitedName',
-		label: '被访人姓名',
-		component: 'el-input',
-		props: {
-			placeholder: '请输入',
-			clearable: true,
-		},
-	},
-	{
-		key: 'passType',
-		field: 'passType',
-		label: '通行类型',
-		component: 'el-select',
-		props: {
-			placeholder: '请选择',
-			clearable: true,
-		},
-		options: passTypeOptions,
-	},
-	{
-		key: 'passMethod',
-		field: 'passMethod',
-		label: '通行方式',
-		component: 'el-select',
-		props: {
-			placeholder: '请选择',
-			clearable: true,
-		},
-		options: passMethodOptions,
-	},
-	{
-		key: 'appointmentNo',
-		field: 'appointmentNo',
-		label: '访客单号',
-		component: 'el-input',
-		props: {
-			placeholder: '请输入',
-			clearable: true,
-		},
-	},
-	{
-		key: 'passLocation',
-		field: 'passLocation',
-		label: '通行位置',
-		component: 'el-input',
-		props: {
-			placeholder: '请输入',
-			clearable: true,
-		},
-	},
-];
+};
 
-export const tableColumnConfigs: AccessRecordTableColumnConfig[] = [
-	{ key: 'seq', prop: 'seq', label: '序号', width: 70, type: 'index', fixed: 'left' },
-	{ key: 'appointmentNo', prop: 'appointmentNo', label: '访客单号', minWidth: 110 },
-	{ key: 'passTime', prop: 'passTime', label: '通行时间', minWidth: 160 },
-	{ key: 'passTypeLabel', prop: 'passTypeLabel', label: '通行类型', minWidth: 110 },
-	{ key: 'passMethodLabel', prop: 'passMethodLabel', label: '通行方式', minWidth: 110 },
-	{ key: 'licensePlate', prop: 'licensePlate', label: '车牌号', minWidth: 110 },
-	{ key: 'passLocation', prop: 'passLocation', label: '通行位置', minWidth: 130 },
-	{ key: 'captureUrl', prop: 'captureUrl', label: '抓拍', width: 90, type: 'preview' },
-	{ key: 'visitorName', prop: 'visitorName', label: '访客姓名', minWidth: 110 },
-	{ key: 'visitorPhone', prop: 'visitorPhone', label: '访客手机号', minWidth: 130 },
-	{ key: 'visitedName', prop: 'visitedName', label: '被访人姓名', minWidth: 110 },
-	{ key: 'visitedEnterprise', prop: 'visitedEnterprise', label: '被访人企业', minWidth: 130 },
-	{ key: 'visitedPhone', prop: 'visitedPhone', label: '被访人手机号', minWidth: 130 },
-	{ key: 'status', prop: 'status', label: '访问状态', minWidth: 110, type: 'status' },
-	{ key: 'operation', prop: 'operation', label: '操作', width: 90, type: 'operation', fixed: 'right' },
+const passTypeLabelMap: Record<string, string> = {
+	enter: '入',
+	exit: '出',
+};
+
+const passMethodLabelMap: Record<string, string> = {
+	vehicle: '车辆通行',
+	person_scan: '行人扫码',
+};
+
+export const tableColumns: TableColumn[] = [
+	{ prop: 'appointmentNo', label: '访客单号', minWidth: 110, align: 'center' },
+	{ prop: 'passTime', label: '通行时间', minWidth: 160, align: 'center' },
+	{
+		prop: 'passType',
+		label: '通行类型',
+		minWidth: 110,
+		align: 'center',
+		formatter: (row) => passTypeLabelMap[row.passType as string] ?? '',
+	},
+	{
+		prop: 'passMethod',
+		label: '通行方式',
+		minWidth: 110,
+		align: 'center',
+		formatter: (row) => passMethodLabelMap[row.passMethod as string] ?? '',
+	},
+	{ prop: 'licensePlate', label: '车牌号', minWidth: 110, align: 'center' },
+	{ prop: 'passLocation', label: '通行位置', minWidth: 130, align: 'center' },
+	{ prop: 'captureUrl', label: '抓拍', width: 90, align: 'center', slot: 'captureSlot' },
+	{ prop: 'visitorName', label: '访客姓名', minWidth: 110, align: 'center' },
+	{ prop: 'visitorPhone', label: '访客手机号', minWidth: 130, align: 'center' },
+	{ prop: 'visitedName', label: '被访人姓名', minWidth: 110, align: 'center' },
+	{ prop: 'visitedEnterprise', label: '被访人企业', minWidth: 130, align: 'center' },
+	{ prop: 'visitedPhone', label: '被访人手机号', minWidth: 130, align: 'center' },
+	{ prop: 'status', label: '访问状态', minWidth: 110, align: 'center', slot: 'statusSlot' },
+	{
+		prop: 'operation',
+		label: '操作',
+		type: 'operation',
+		width: 90,
+		fixed: 'right',
+		align: 'center',
+		operations: [{ label: '详情', action: 'detail', type: 'primary', link: true }],
+	},
 ];
 
 export const detailSectionConfigs: DetailSectionConfig[] = [

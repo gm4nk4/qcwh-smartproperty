@@ -246,10 +246,11 @@
 
 ### B2. 通行记录
 
-- **状态**: ☐ pending
+- **状态**: ☑ done (PR #TBD, 2026-05-20)
 - **Owns**: `visitor/src/views/visitor/access-records/**`
 - **依赖**: P0-1, P0-2, P0-3
 - **历史**:
+  - 2026-05-20 PR #TBD 通行记录列表页接入 ConfigurableTableWithForm,移除自研查询面板/表格/分页,保留详情弹窗
 
 ### B3. 黑名单管理
 
